@@ -18,5 +18,6 @@ $$
 #### Making bonds
 When an agent's degree is lower than its [[Agent Properties#Degree (int)|target degree]], it will attempt to bond to other agents in the system.
 TODO: Probability of targeting an agent for bond formation; random sampling from system for now.
-The probability for two agents to bond is given as
+The probability for two agents depend on whether the initiator and target agents "click", which is determined by the difference in opinion between the two agents and both their tolerances. It is given as
 $$p_{click} = {{(1 - {|op_A - op_B| \over range}) * tol_A * tol_B}}$$
+#behavior #agents

@@ -9,3 +9,5 @@ Value in range $[0,1]$ that affects how likely an agent is of maintaining it's c
 
 #### Degree (int):
 The target amount of edges an agent aims to maintain.
+
+#properties #agents

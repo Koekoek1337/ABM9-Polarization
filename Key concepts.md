@@ -1,3 +1,6 @@
+This document describes a more chaotic outline for the model described in our [[proposal]], mostly written as an inspiration piece. Feel free to add to it.
+
+More concise descriptions of the Agent Properties and behavior can be found [[Agent Properties|here]] and [[Agent Behavior|here]].
 ## Agents
 The agents of the system represent the inhabitants of a simplified bi-opinionated society, where one can be fully for opinion A, fully for opinion B, or anywhere in between. The agents are represented as nodes on a graph space where every edge represents an interpersonal relation. Agents form and break edges as they me
 
