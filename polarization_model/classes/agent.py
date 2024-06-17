@@ -22,8 +22,13 @@ class PolarizationAgent(mesa.Agent):
         self.tolerance = tolerance
         """How tolerant an agent is to different minded individuals"""
         self.targetDegree = targetDegree
-        """The amount of connections an agent attempts to maintain. -1 means there is no limit in the amount of
-        connections an agent has"""
+        """
+        The amount of connections an agent attempts to maintain. -1 means there is no limit in the amount of
+        connections an agent has. 
+
+        Currently only used internally in agent. If future external agent behavior relies on targetDegree, 
+        it should be compatible with the step-advance structure.
+        """
 
         self.newOpinion = opinion
         """Agent opinion for the next step, for use in the advance method for simultaneous activation."""
@@ -44,22 +49,46 @@ class PolarizationAgent(mesa.Agent):
               and diffuse interactions (changing opinion).
               This guarantees that an agent may choose to break off a social bond before conforming to
               an opinion they do not tolerate using the simultaneous activation scheduler
+        TODO: Find simple way to fetch node degree from networkx graph or equivalent solution (eg. just
+              keep track of edges separately)
         """
-        pass
-        # Steptype conform
-        self.conformStep()
-        # Steptype Social
+        PLACEHOLDER = 0
+
+        # Steptype conform (TODO)
+        if True:
+            self.conformStep()
+            self.fluctuateStep()
+
+        # Steptype Social (TODO)
+        if True:
+            self.intoleranceStep()
+
+            nEdges = PLACEHOLDER
+            if nEdges < self.targetDegree or self.targetDegree == -1:
+                self.socializeStep()
+
 
     def advance(self) -> None:
         """
-        TODO: Implement advance method that processes self.pendingInteractions
-
-        TODO: Also use step types as described in self.step().
+        TODO: Implement method that processes self.pendingInteractions for steptype social.
+        TODO: Also use step types as described in todo of self.step().
         """
-        pass
-        # Steptype conform
+        assert isinstance(self.model, PolarizationModel)
+
+        # Steptype conform (TODO)
         self.opinion = self.newOpinion
-        # Steptype Social
+        self.newOpinion = 0
+
+        # Enforce opinion boundary conditions
+        if self.opinion < self.model.opinionA:
+            self.opinion = self.model.opinionA
+        elif self.opinion > self.model.opinionB:
+            self.opinion = self.model.opinionB
+        
+        # Steptype Social (TODO)
+        if self.pendingInteraction:
+            # Process pending transactions
+            self.pendingInteraction.clear()
 
     def conformStep(self) -> float:
         """
@@ -67,8 +96,9 @@ class PolarizationAgent(mesa.Agent):
 
         Make agent conform to it's neighbor's opinions according to
         $$op_{t+1} = {\overline{op}_{neigh}conf + op_t(1 - conf)}$$
+        and update newOpinion
 
-        Returns the new opinion of the agent
+        Returns (float) the new opinion of the agent
         """
         if self.conformity == 0.0:
             self.newOpinion = self.opinion
@@ -81,6 +111,20 @@ class PolarizationAgent(mesa.Agent):
         newOpinion = (meanOpinion * self.conformity + self.opinion * (1-self.conformity)) / 2 # calculate new opinion
         
         self.newOpinion = newOpinion
+        return newOpinion
+
+    def fluctuateStep(selt) -> float:
+        """
+        TODO: Implement random fluctuation of opinion (eg sampling from normal distribution centered around)
+
+        Fluctuates the current opinion of the agent by a random amount and update newOpinion.
+        
+        Returns (float) the new opinion of the agent
+        """
+        PLACEHOLDER = 0
+        randomVal = PLACEHOLDER
+        newOpinion = newOpinion + randomVal
+
         return newOpinion
 
     def intoleranceStep(self) -> int:
@@ -106,14 +150,39 @@ class PolarizationAgent(mesa.Agent):
     def socializeStep(self):
         """
         TODO: add method that creates a pending transaction between a node if they click
+        TODO: Decide on method for sampling from existing population
         """
-    
+        targetID = self.sampleAcquaintance()
+        # TODO: Better "click" function in `agent behavior.md` current iteration is heavily flawed
+        PLACEHOLDER = 1
+        pClick = PLACEHOLDER
+        
+        if self.random.random() < pClick:
+            self.pendingInteraction.append((+1, targetID))
+
+    def sampleAcquaintance(self) -> int:
+        """
+        TODO: Decide ona  more robust way of sampling agents (eg. by preferring friends of friends rather
+              than random agents in the system)
+
+        Simple sampling function that allows a node to attempt a connection to a random agent in the
+        system
+
+        Returns: (int) The node ID containing an agent to attempt a bond with, which is currently not
+        bonded to the agent.
+        """
+        assert isinstance(self.model, PolarizationModel)
+
+        targetID = self.random.choice(self.nonBondedNodes())
+        return targetID
 
     def nonBondedNodes(self) -> List[int]:
         """
         TODO: Testing
+        Returns a list of node_ids/ unique agent IDs of agents that are not yet bonded for simple
+        random sampling.
         
-        Returns (List[int]): The node_ids which are not bonded to the agent node.
+        Returns: (List[int]) The node_ids which are not bonded to the agent node.
         """
         assert isinstance(self.model, PolarizationModel)
 
