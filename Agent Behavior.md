@@ -20,4 +20,8 @@ When an agent's degree is lower than its [[Agent Properties#Degree (int)|target 
 TODO: Probability of targeting an agent for bond formation; random sampling from system for now.
 The probability for two agents depend on whether the initiator and target agents "click", which is determined by the difference in opinion between the two agents and both their tolerances. It is given as
 $$p_{click} = {{(1 - {|op_A - op_B| \over range}) * tol_A * tol_B}}$$
+(Need a better Click formula. Now two intolerant agents with identical opinions will have a small chance
+to click regardless)
+
+
 #behavior #agents
