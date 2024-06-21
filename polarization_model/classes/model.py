@@ -3,12 +3,11 @@ import networkx as nx
 import numpy as np
 
 from agent import PolarizationAgent
+from constants import *
 
-from typing import Any, Tuple
+from typing import Any, Tuple, List
 
 
-OPINION_A = -1
-OPINION_B = 1
 
 class PolarizationModel(mesa.Model):
     """
@@ -20,7 +19,7 @@ class PolarizationModel(mesa.Model):
 
         self.graph = nx.Graph()
         """Graph object for use in network space, for ease of acces with creating and removing nodes/edges"""
-
+        
         self.space = mesa.space.NetworkGrid(self.graph)
         """Mesa Network space"""
         
@@ -37,6 +36,23 @@ class PolarizationModel(mesa.Model):
         self.opinionDist = np.abs(self.opinionA) + np.abs(self.opinionB)
         """Absolute distance between opinions A and B"""
 
+        self.phase = 0
+        """Current steptype the agents must follow"""
+
+        return
+    
+    def step(self):
+        # Social step, for making and breaking social bonds
+        self.phase = PHASE_SOCIAL
+        self.scheduler.step()
+
+        # Agent conformity step
+        self.phase = PHASE_CONFORM
+        self.scheduler.step()
+
+        # Data collection
+        return
+
     def addAgent(self, opinion: float, conformity: float, tolerance: float) -> None:
         """
         # TODO: Testing
@@ -52,3 +68,20 @@ class PolarizationModel(mesa.Model):
         newAgent = PolarizationAgent(self.nAgents, self, opinion, conformity, tolerance)
         self.scheduler.add(newAgent)
         self.nAgents += 1
+
+        return
+    
+    def resolveInteraction(self, agent: PolarizationAgent) -> None:
+        """
+        TODO: Testing
+
+        Resolves the pending interactions of an agent.
+        """
+        source = agent.unique_id
+        for action, target in agent.pendingInteraction:
+            if action == MAKE and not self.graph.has_edge(source, target):
+                self.graph.add_edge(source, target)
+        
+            if action == BREAK and self.graph.has_edge(source, target):
+                self.graph.remove_edge(source, target)
+        agent.pendingInteraction.clear()
