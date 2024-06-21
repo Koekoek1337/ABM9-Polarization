@@ -18,7 +18,7 @@ class PolarizationModel(mesa.Model):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-        self.graph = nx.Graph()
+        self.graph = nx.Graph() # Change type to erdos_renyi_graph for random graph
         """Graph object for use in network space, for ease of acces with creating and removing nodes/edges"""
 
         self.space = mesa.space.NetworkGrid(self.graph)
@@ -52,3 +52,26 @@ class PolarizationModel(mesa.Model):
         newAgent = PolarizationAgent(self.nAgents, self, opinion, conformity, tolerance)
         self.scheduler.add(newAgent)
         self.nAgents += 1
+
+    def init_agents(self):
+        # Add ideologues
+        for _ in range(self.n_ideologues):
+            opinion = random.choice([-1.0, 1.0])
+            ideologue = IdeologueAgent(self.nAgents, self, opinion)
+            self.addAgent(ideologue)
+        
+        # Add followers
+        for _ in range(self.n_followers):
+            opinion = random.uniform(-1.0, 1.0)
+            conformity = random.uniform(0.0, 1.0)
+            tolerance = random.uniform(0.0, 1.0)
+            follower = FollowerAgent(self.nAgents, self, opinion, conformity, tolerance)
+            self.addAgent(follower)
+
+    def addAgent(self, agent: PolarizationAgent) -> None:
+        self.graph.add_node(agent.unique_id)
+        self.scheduler.add(agent)
+        self.nAgents += 1
+
+    def step(self):
+        self.scheduler.step()
