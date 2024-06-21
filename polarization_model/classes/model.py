@@ -107,7 +107,9 @@ class PolarizationModel(mesa.Model):
             tolerance:  (float) The fixed tolerance value for the agent
         """
         self.graph.add_node(self.nAgents)
+        self.graph.nodes[self.nAgents]["agent"] = self.space.default_val()
         newAgent = PolarizationAgent(self.nAgents, self, opinion, conformity, tolerance)
+        self.space.place_agent(newAgent, self.nAgents)
         self.scheduler.add(newAgent)
         self.nAgents += 1
 
@@ -130,3 +132,12 @@ class PolarizationModel(mesa.Model):
 
         return
     
+    def agentOpinions(self) -> List[float]:
+        """Returns a list of agents opinions in order of their unique ID. Eg. List[0] corresponds to agent with ID 0."""
+        opinions = [0] * self.nAgents
+
+        for agent in self.scheduler.agents:
+            assert isinstance(agent, PolarizationAgent)
+            opinions[agent.unique_id] = agent.opinion
+
+        return opinions
