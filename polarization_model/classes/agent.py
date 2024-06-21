@@ -1,10 +1,9 @@
 import mesa
+import networkx as nx
 from typing import TYPE_CHECKING, List, Tuple
 import numpy as np
 
-MAKE = +1
-BREAK = -1
-
+from constants import *
 
 if TYPE_CHECKING:
     from model import PolarizationModel
@@ -14,7 +13,9 @@ if TYPE_CHECKING:
 class PolarizationAgent(mesa.Agent):
     def __init__(self, unique_id: int, model: PolarizationModel, opinion: float, conformity: float, tolerance: float, targetDegree = -1) -> None:
         super().__init__(unique_id, model)
-
+        self.model = model
+        
+        # Agent attributes
         self.opinion = opinion
         """Relative allegiance of political interest"""
         self.conformity = conformity
@@ -30,6 +31,8 @@ class PolarizationAgent(mesa.Agent):
         it should be compatible with the step-advance structure.
         """
 
+
+        # Advance attributes
         self.newOpinion = opinion
         """Agent opinion for the next step, for use in the advance method for simultaneous activation."""
         self.pendingInteraction: List[Tuple[int, int]] = []
@@ -45,50 +48,40 @@ class PolarizationAgent(mesa.Agent):
 
     def step(self):
         """
-        TODO: Implement two separate step types for social network interactions (eg. making and breaking bonds) 
-              and diffuse interactions (changing opinion).
-              This guarantees that an agent may choose to break off a social bond before conforming to
-              an opinion they do not tolerate using the simultaneous activation scheduler
-        TODO: Find simple way to fetch node degree from networkx graph or equivalent solution (eg. just
-              keep track of edges separately)
-        """
-        PLACEHOLDER = 0
+        TODO: Testing
 
-        # Steptype conform (TODO)
-        if True:
+        Mesa step function
+        """
+        degree = nx.degree(self.model.graph, )
+
+        # Steptype conform
+        if self.model.phase == PHASE_CONFORM:
             self.conformStep()
             self.fluctuateStep()
 
-        # Steptype Social (TODO)
-        if True:
-            self.intoleranceStep()
+        # Steptype Social
+        if self.model.phase == PHASE_SOCIAL:
+            degree -= self.intoleranceStep()
 
-            nEdges = PLACEHOLDER
-            if nEdges < self.targetDegree or self.targetDegree == -1:
+            if degree < self.targetDegree or self.targetDegree < 0:
                 self.socializeStep()
-
 
     def advance(self) -> None:
         """
-        TODO: Implement method that processes self.pendingInteractions for steptype social.
-        TODO: Also use step types as described in todo of self.step().
+        TODO: Testing
         """
-        assert isinstance(self.model, PolarizationModel)
+        if self.model.phase == PHASE_CONFORM:
+            self.opinion = self.newOpinion
+            self.newOpinion = 0
 
-        # Steptype conform (TODO)
-        self.opinion = self.newOpinion
-        self.newOpinion = 0
+            # Enforce opinion boundary conditions
+            if self.opinion < self.model.opinionA:
+                self.opinion = self.model.opinionA
+            elif self.opinion > self.model.opinionB:
+                self.opinion = self.model.opinionB
 
-        # Enforce opinion boundary conditions
-        if self.opinion < self.model.opinionA:
-            self.opinion = self.model.opinionA
-        elif self.opinion > self.model.opinionB:
-            self.opinion = self.model.opinionB
-        
-        # Steptype Social (TODO)
-        if self.pendingInteraction:
-            # Process pending transactions
-            self.pendingInteraction.clear()
+        if self.model.phase == PHASE_SOCIAL:
+            self.model.resolveInteraction(self)
 
     def conformStep(self) -> float:
         """
@@ -136,7 +129,7 @@ class PolarizationAgent(mesa.Agent):
 
         Returns: The amount of nodes from which their connection is to be removed.
         """
-        assert isinstance(self.model, PolarizationModel)
+        breaks = 0
 
         neighbors = self.model.space.get_neighbors(self.unique_id)
         for neighbor in neighbors:
@@ -146,6 +139,9 @@ class PolarizationAgent(mesa.Agent):
             """Probability of an agent relation breaking as result from an intolerance of opinion"""
             if self.random.random() < pBreak:
                 self.pendingInteraction.append((BREAK, neighbor.unique_id))
+                breaks += 1
+        
+        return breaks
 
     def socializeStep(self):
         """
@@ -162,7 +158,7 @@ class PolarizationAgent(mesa.Agent):
 
     def sampleAcquaintance(self) -> int:
         """
-        TODO: Decide ona  more robust way of sampling agents (eg. by preferring friends of friends rather
+        TODO: Decide on a more robust way of sampling agents (eg. by preferring friends of friends rather
               than random agents in the system)
 
         Simple sampling function that allows a node to attempt a connection to a random agent in the
@@ -171,8 +167,6 @@ class PolarizationAgent(mesa.Agent):
         Returns: (int) The node ID containing an agent to attempt a bond with, which is currently not
         bonded to the agent.
         """
-        assert isinstance(self.model, PolarizationModel)
-
         targetID = self.random.choice(self.nonBondedNodes())
         return targetID
 
@@ -184,8 +178,6 @@ class PolarizationAgent(mesa.Agent):
         
         Returns: (List[int]) The node_ids which are not bonded to the agent node.
         """
-        assert isinstance(self.model, PolarizationModel)
-
         neighbor_nodes = self.model.space.get_neighborhood(self.unique_id)
         nonBonded = [i for i in range(self.model.nAgents) if i not in neighbor_nodes]
 
