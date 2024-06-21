@@ -2,6 +2,8 @@ import mesa
 import networkx as nx
 import numpy as np
 
+from random import Random
+
 from agent import PolarizationAgent
 from constants import *
 
@@ -52,6 +54,46 @@ class PolarizationModel(mesa.Model):
 
         # Data collection
         return
+    
+    def generateAgents(self, nAgents: int, meanOpinion: float, stDefOpinion: float, minConformity: float=0.0, 
+                       maxConformity:float=1.0, minTolerance:float=0.0, maxTolerance: float=1.0) -> None:
+        """
+        # TODO: Testing
+
+        Generates nAgents agents with randomized properties. Opinion is sampled based on a normal distribution
+        with a given mean and standard deviation, truncated to the domain [self.opinionA, self.opinionB]. 
+        Conformity and tolerance are sampled from a uniform distribution within the given domain.
+
+        Args:
+            nAgents:       (int)   The amount of agents to be generated.
+            meanOpinion:   (float) The mean opinion for normal distribution sampling.
+            stDevOpinion:  (float) The standard devition in opinion for distribution sampling.
+            minConformity: (float) The minimum conformity for uniform sampling.
+            maxconformity: (float) The maximum conformity for uniform sampling.
+            minTolerance:  (float) The minimum tolerance for uniform sampling.
+            maxTolerance:  (float) The maximum tolerance for uniform sampling.
+        """
+        assert isinstance(self.random, Random)
+        for i in range(nAgents):
+            opinion    = self.random.gauss(meanOpinion,    stDefOpinion   )
+            if opinion < self.opinionA:
+                opinion = self.opinionA
+            if opinion > self.opinionB:
+                opinion = self.opinionB
+
+            conformity = self.random.uniform(minConformity, maxConformity)
+            tolerance  = self.random.uniform(minTolerance,  maxTolerance )
+
+            self.addAgent(opinion, conformity, tolerance)
+        return
+    
+    def preConnect_Network(self, nIter: int):
+        """
+        Initializes a network of the model by running the socialization step nIter times
+        """
+        self.phase = PHASE_SOCIAL
+        for _ in range(nIter):
+            self.scheduler.step()
 
     def addAgent(self, opinion: float, conformity: float, tolerance: float) -> None:
         """
@@ -85,3 +127,6 @@ class PolarizationModel(mesa.Model):
             if action == BREAK and self.graph.has_edge(source, target):
                 self.graph.remove_edge(source, target)
         agent.pendingInteraction.clear()
+
+        return
+    
