@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import networkx as nx
 
 from .agent import PolarizationAgent
@@ -9,14 +10,15 @@ class Visualizer():
         self.model        = model
         self.graph        = model.graph
         self.pos          = nx.spring_layout(self.graph)
-        self.fig, self.ax = plt.subplots()
-        
-        assert isinstance(self.ax, plt.Axes)
+        self.fig, ax = plt.subplots()
+        assert isinstance(ax, plt.Axes)
+        self.ax = ax
 
-        self.drawNodes()
-        plt.show()
+        self.text = self.ax.text(0.8, 0.9, f"i = {0}")
     
-    def drawNodes(self):
+        self.drawNetworkx()
+    
+    def drawNetworkx(self):
         cmap = []
         for nodeID, opinion in zip(list(range(self.model.nAgents)), self.model.agentOpinions()):
             color = self.colorpicker(opinion)
@@ -24,10 +26,20 @@ class Visualizer():
 
         nx.draw(self.graph, node_color=cmap, ax=self.ax)
 
-    def frame(self):
-        pass
-        
-
     def colorpicker(self, opinion):
         if opinion < 0: return "Blue"
         if opinion > 0: return "Red"
+
+    def _frame(self, framenum):
+        self.model.step()
+
+        self.ax.clear()
+        self.drawNetworkx()
+        self.text = self.ax.text(0.8, 0.9, f"i = {framenum}")
+        return
+    
+    def run(self, nFrames = 100, fps = 1):
+        self.ani = FuncAnimation(self.fig, self._frame, frames=nFrames, interval=1000 / fps, repeat = False)
+        plt.show()
+        self.ani.save(f"test.mp4")
+
