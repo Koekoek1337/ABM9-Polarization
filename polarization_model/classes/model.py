@@ -4,8 +4,8 @@ import numpy as np
 
 from random import Random
 
-from agent import PolarizationAgent
-from constants import *
+from .agent import PolarizationAgent
+from .constants import *
 
 from typing import Any, Tuple, List
 

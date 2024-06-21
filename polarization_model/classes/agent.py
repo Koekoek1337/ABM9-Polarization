@@ -3,7 +3,7 @@ import networkx as nx
 from typing import TYPE_CHECKING, List, Tuple
 import numpy as np
 
-from constants import *
+from .constants import *
 
 if TYPE_CHECKING:
     from model import PolarizationModel
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 # TODO: Prevent edge case where two nodes make a pending connection to eachother.
 
 class PolarizationAgent(mesa.Agent):
-    def __init__(self, unique_id: int, model: PolarizationModel, opinion: float, conformity: float, tolerance: float, targetDegree = -1) -> None:
+    def __init__(self, unique_id: int, model: "PolarizationModel", opinion: float, conformity: float, tolerance: float, targetDegree = -1) -> None:
         super().__init__(unique_id, model)
         self.model = model
         
