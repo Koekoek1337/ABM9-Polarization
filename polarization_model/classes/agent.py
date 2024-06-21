@@ -9,7 +9,7 @@ BREAK = -1
 if TYPE_CHECKING:
     from model import PolarizationModel
 
-# TODO: Prevent edge case where two nodes make a pending connection to eachother.
+# TODO: Prevent edge case where two nodes make a pending connection to each other.
 
 class PolarizationAgent(mesa.Agent):
     def __init__(self, unique_id: int, model: PolarizationModel, opinion: float, conformity: float, tolerance: float, targetDegree = -1) -> None:
@@ -42,6 +42,23 @@ class PolarizationAgent(mesa.Agent):
             BREAK (Literal[-1]): Remove a node connection
         Transaction[1] represents the unique_id of the target node
         """
+    
+    def add_pending_interaction(self, action: int, target_id: int) -> None:
+        """
+        Adds a pending interaction, ensuring that mutual connections are not duplicated.
+
+        Args:
+            action: (int) +1 for MAKE connection, -1 for BREAK connection
+            target_id: (int) The unique ID of the target agent
+        """
+        if action == 1:  # +1 represents MAKE connection
+            # Check if the target agent already has a pending MAKE connection to this agent
+            target_agent = self.model.schedule.get_agent(target_id)
+            if (1, self.unique_id) not in target_agent.pendingInteraction:
+                self.pendingInteraction.append((action, target_id))
+        else:
+            # For BREAK connection or other actions, just add it
+            self.pendingInteraction.append((action, target_id))
 
     def step(self):
         """
