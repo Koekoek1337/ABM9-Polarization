@@ -97,7 +97,7 @@ class PolarizationAgent(mesa.Agent):
             self.newOpinion = self.opinion
             return self.newOpinion
         
-        assert isinstance(self.model, PolarizationModel)
+        if TYPE_CHECKING: assert isinstance(self.model, PolarizationModel)
         
         neighbors = self.model.space.get_neighbors(self.unique_id)              # Get list of connected neighbors
         meanOpinion = np.mean([n.opinion for n in neighbors])                   # Calculate mean opinion of neighbors
@@ -106,7 +106,7 @@ class PolarizationAgent(mesa.Agent):
         self.newOpinion = newOpinion
         return newOpinion
 
-    def fluctuateStep(selt) -> float:
+    def fluctuateStep(self) -> float:
         """
         TODO: Implement random fluctuation of opinion (eg sampling from normal distribution centered around)
 
@@ -116,7 +116,7 @@ class PolarizationAgent(mesa.Agent):
         """
         PLACEHOLDER = 0
         randomVal = PLACEHOLDER
-        newOpinion = newOpinion + randomVal
+        newOpinion = self.opinion + randomVal
 
         return newOpinion
 
