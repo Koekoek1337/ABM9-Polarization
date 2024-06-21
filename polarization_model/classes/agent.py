@@ -52,7 +52,7 @@ class PolarizationAgent(mesa.Agent):
 
         Mesa step function
         """
-        degree = nx.degree(self.model.graph, )
+        degree = nx.degree(self.model.graph, self.unique_id)
 
         # Steptype conform
         if self.model.phase == PHASE_CONFORM:
