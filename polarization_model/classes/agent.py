@@ -149,6 +149,10 @@ class PolarizationAgent(mesa.Agent):
         TODO: Decide on method for sampling from existing population
         """
         targetID = self.sampleAcquaintance()
+
+        if targetID is None:
+            return
+        
         # TODO: Better "click" function in `agent behavior.md` current iteration is heavily flawed
         PLACEHOLDER = 1
         pClick = PLACEHOLDER
@@ -165,9 +169,12 @@ class PolarizationAgent(mesa.Agent):
         system
 
         Returns: (int) The node ID containing an agent to attempt a bond with, which is currently not
-        bonded to the agent.
+        bonded to the agent. Returns None if there are no possible targets.
         """
-        targetID = self.random.choice(self.nonBondedNodes())
+        possibleTargets = self.nonBondedNodes()
+        if not possibleTargets: 
+            return None
+        targetID = self.random.choice(possibleTargets)
         return targetID
 
     def nonBondedNodes(self) -> List[int]:
@@ -179,6 +186,6 @@ class PolarizationAgent(mesa.Agent):
         Returns: (List[int]) The node_ids which are not bonded to the agent node.
         """
         neighbor_nodes = self.model.space.get_neighborhood(self.unique_id)
-        nonBonded = [i for i in range(self.model.nAgents) if i not in neighbor_nodes]
+        nonBonded = [i for i in range(self.model.nAgents) if i not in neighbor_nodes if i != self.unique_id]
 
         return nonBonded
