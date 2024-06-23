@@ -23,5 +23,9 @@ $$p_{click} = {{(1 - {|op_A - op_B| \over range}) * tol_A * tol_B}}$$
 (Need a better Click formula. Now two intolerant agents with identical opinions will have a small chance
 to click regardless)
 
+-> $1 - min(P_{break})$
+
+$$p_{click} = {{1 - {|op_A - op_B| \over range} (1 - \text{min}(tol_A,tol_B))}}$$
+
 
 #behavior #agents
