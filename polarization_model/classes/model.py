@@ -19,7 +19,7 @@ class PolarizationModel(mesa.Model):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-        self.graph = nx.Graph() # Change type to erdos_renyi_graph for random graph
+        self.graph = nx.Graph()
         """Graph object for use in network space, for ease of acces with creating and removing nodes/edges"""
         
         self.space = mesa.space.NetworkGrid(self.graph)

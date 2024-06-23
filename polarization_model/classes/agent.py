@@ -8,7 +8,7 @@ from .constants import *
 if TYPE_CHECKING:
     from model import PolarizationModel
 
-# TODO: Prevent edge case where two nodes make a pending connection to each other. - Done.
+# TODO: Prevent edge case where two nodes make a pending connection to eachother.
 
 class PolarizationAgent(mesa.Agent):
     def __init__(self, unique_id: int, model: "PolarizationModel", opinion: float, conformity: float, tolerance: float, targetDegree = -1) -> None:
@@ -45,23 +45,6 @@ class PolarizationAgent(mesa.Agent):
             BREAK (Literal[-1]): Remove a node connection
         Transaction[1] represents the unique_id of the target node
         """
-    
-    def add_pending_interaction(self, action: int, target_id: int) -> None:
-        """
-        Adds a pending interaction, ensuring that mutual connections are not duplicated.
-
-        Args:
-            action: (int) +1 for MAKE connection, -1 for BREAK connection
-            target_id: (int) The unique ID of the target agent
-        """
-        if action == 1:  # +1 represents MAKE connection
-            # Check if the target agent already has a pending MAKE connection to this agent
-            target_agent = self.model.schedule.get_agent(target_id)
-            if (1, self.unique_id) not in target_agent.pendingInteraction:
-                self.pendingInteraction.append((action, target_id))
-        else:
-            # For BREAK connection or other actions, just add it
-            self.pendingInteraction.append((action, target_id))
 
     def step(self):
         """
@@ -129,7 +112,7 @@ class PolarizationAgent(mesa.Agent):
 
     def fluctuateStep(self) -> float:
         """
-        # TODO: Implement random fluctuation of opinion (eg sampling from normal distribution centered around)
+        TODO: Implement random fluctuation of opinion (eg sampling from normal distribution centered around)
 
         Fluctuates the current opinion of the agent by a random amount and update newOpinion.
         
@@ -152,7 +135,7 @@ class PolarizationAgent(mesa.Agent):
         """
         breaks = 0
 
-        neighbors = self.model.graph.get_neighbors(self.unique_id)
+        neighbors = self.model.space.get_neighbors(self.unique_id)
         for neighbor in neighbors:
             assert isinstance(neighbor, PolarizationAgent)
 
@@ -188,55 +171,19 @@ class PolarizationAgent(mesa.Agent):
 
     def sampleAcquaintance(self) -> int:
         """
-        TODO: Decide on a more robust way of sampling agents (e.g., by preferring friends of friends rather
-            than random agents in the system)
+        TODO: Decide on a more robust way of sampling agents (eg. by preferring friends of friends rather
+              than random agents in the system)
 
         Simple sampling function that allows a node to attempt a connection to a random agent in the
         system
 
         Returns: (int) The node ID containing an agent to attempt a bond with, which is currently not
-        bonded to the agent.
+        bonded to the agent. Returns None if there are no possible targets.
         """
-        assert isinstance(self.model, PolarizationModel)
-
-        targetID = self.random.choice(self.nonBondedNodes())
-        return targetID
-    
-    def weightedSample(self) -> int:
-        """
-        Modified sampling function that allows a node to attempt a connection to a neighbor or neighbor of a neighbor
-        in the system, with a preference for closer nodes in terms of network distance, using exponential distribution.
-
-        Returns: (int) The node ID containing an agent to attempt a bond with, which is currently not
-        bonded to the agent.
-        """
-        assert isinstance(self.model, PolarizationModel)
-
-        neighbors = self.model.graph.get_neighbors(self.unique_id)  # Get direct neighbors
-        neighbors_of_neighbors = set()  # Set to store neighbors of neighbors
-
-        for neighbor in neighbors:
-            neighbors_of_neighbors.update(self.model.graph.get_neighbors(neighbor))  # Add neighbors of neighbors to set
-
-        # Remove nodes already bonded to self
-        non_bonded_nodes = [node_id for node_id in neighbors_of_neighbors if node_id not in self.model.graph.neighbors(self.unique_id)]
-
-        if not non_bonded_nodes:
-            non_bonded_nodes = self.nonBondedNodes()  # Fall back to all non-bonded nodes if no neighbors of neighbors found
-
-        # Calculate distances of non-bonded nodes from self
-        distances = [nx.shortest_path_length(self.model.graph, self.unique_id, node_id) for node_id in non_bonded_nodes]
-
-        # Calculate probabilities based on exponential distribution (higher probability for closer nodes)
-        distances = np.array(distances)
-        probabilities = np.exp(-distances / distances.max())  # Exponential distribution based on distances
-
-        # Normalize probabilities
-        probabilities /= probabilities.sum()
-
-        # Sample node ID based on calculated probabilities
-        targetID = self.random.choice(non_bonded_nodes, p=probabilities)
-        
+        possibleTargets = self.nonBondedNodes()
+        if not possibleTargets: 
+            return None
+        targetID = self.random.choice(possibleTargets)
         return targetID
 
     def nonBondedNodes(self) -> List[int]:
@@ -251,13 +198,3 @@ class PolarizationAgent(mesa.Agent):
         nonBonded = [i for i in range(self.model.nAgents) if i not in neighbor_nodes if i != self.unique_id]
 
         return nonBonded
-    
-class IdeologueAgent(PolarizationAgent):
-    def __init__(self, unique_id: int, model: PolarizationModel, opinion: float) -> None:
-        super().__init__(unique_id, model, opinion, conformity=0.0, tolerance=0.0, targetDegree=-1)
-        """Ideologues have fixed opinions (e.g., -1 or +1), no conformity, and zero tolerance."""
-
-class FollowerAgent(PolarizationAgent):
-    def __init__(self, unique_id: int, model: PolarizationModel, opinion: float, conformity: float, tolerance: float) -> None:
-        super().__init__(unique_id, model, opinion, conformity, tolerance, targetDegree=-1)
-        """Followers have varying opinions, conformity, and tolerance."""
