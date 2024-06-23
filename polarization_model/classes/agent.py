@@ -100,8 +100,12 @@ class PolarizationAgent(mesa.Agent):
         if TYPE_CHECKING: assert isinstance(self.model, PolarizationModel)
         
         neighbors = self.model.space.get_neighbors(self.unique_id)              # Get list of connected neighbors
-        meanOpinion = np.mean([n.opinion for n in neighbors])                   # Calculate mean opinion of neighbors
-        newOpinion = (meanOpinion * self.conformity + self.opinion * (1-self.conformity)) / 2 # calculate new opinion
+        if neighbors:
+            meanOpinion = np.mean([n.opinion for n in neighbors])                   # Calculate mean opinion of neighbors
+            newOpinion = (meanOpinion * self.conformity + self.opinion * (1-self.conformity)) / 2 # calculate new opinion
+
+        else:
+            newOpinion = self.opinion
         
         self.newOpinion = newOpinion
         return newOpinion
@@ -163,7 +167,7 @@ class PolarizationAgent(mesa.Agent):
         if self.random.random() < pClick:
             self.pendingInteraction.append((+1, targetID))
         
-        
+
 
     def sampleAcquaintance(self) -> int:
         """
