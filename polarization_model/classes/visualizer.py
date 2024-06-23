@@ -10,7 +10,7 @@ class Visualizer():
         self.model        = model
         self.graph        = model.graph
         self.pos          = nx.spring_layout(self.graph)
-        self.fig, ax = plt.subplots()
+        self.fig, ax      = plt.subplots()
         assert isinstance(ax, plt.Axes)
         self.ax = ax
 
@@ -24,17 +24,18 @@ class Visualizer():
             color = self.colorpicker(opinion)
             cmap.append(color)
 
-        nx.draw(self.graph, node_color=cmap, ax=self.ax)
+        nx.draw_circular(self.graph, node_color=cmap, ax=self.ax)
 
     def colorpicker(self, opinion):
-        if opinion < 0: return "Blue"
-        if opinion > 0: return "Red"
+        if opinion < 0.0:  return "Blue"
+        if opinion > 0.0:  return "Red"
+        else: return "Grey"
 
     def _frame(self, framenum):
-        self.model.step()
-
         self.ax.clear()
         self.drawNetworkx()
+        self.model.step()
+
         self.text = self.ax.text(0.8, 0.9, f"i = {framenum}")
         return
     
