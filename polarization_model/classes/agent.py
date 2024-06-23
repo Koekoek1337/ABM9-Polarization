@@ -102,7 +102,7 @@ class PolarizationAgent(mesa.Agent):
         neighbors = self.model.space.get_neighbors(self.unique_id)              # Get list of connected neighbors
         if neighbors:
             meanOpinion = np.mean([n.opinion for n in neighbors])                   # Calculate mean opinion of neighbors
-            newOpinion = (meanOpinion * self.conformity + self.opinion * (1-self.conformity)) / 2 # calculate new opinion
+            newOpinion = (meanOpinion * self.conformity + self.opinion * (1-self.conformity)) # calculate new opinion
 
         else:
             newOpinion = self.opinion
@@ -135,10 +135,8 @@ class PolarizationAgent(mesa.Agent):
         """
         breaks = 0
 
-        neighbors = self.model.graph.get_neighbors(self.unique_id)
+        neighbors = self.model.space.get_neighbors(self.unique_id)
         for neighbor in neighbors:
-            assert isinstance(neighbor, PolarizationAgent)
-
             pBreak = (1 - self.tolerance) * np.abs(self.opinion - neighbor.opinion) / self.model.opinionDist
             """Probability of an agent relation breaking as result from an intolerance of opinion"""
             if self.random.random() < pBreak:
@@ -149,7 +147,6 @@ class PolarizationAgent(mesa.Agent):
 
     def socializeStep(self):
         """
-        TODO: add method that creates a pending transaction between a node if they click
         TODO: Decide on method for sampling from existing population
         """
         targetID = self.sampleAcquaintance()
@@ -158,16 +155,12 @@ class PolarizationAgent(mesa.Agent):
             return
         
         targetAgent = self.model.scheduler.agents[targetID]
-        assert isinstance(targetAgent, PolarizationAgent)
-
         dOpinion = abs(self.opinion - targetAgent.opinion) / self.model.opinionDist
         
         pClick = 1 - (1 - (min(self.tolerance, targetAgent.tolerance))) * dOpinion
         
         if self.random.random() < pClick:
             self.pendingInteraction.append((MAKE, targetID))
-        
-
 
     def sampleAcquaintance(self) -> int:
         """
@@ -180,9 +173,10 @@ class PolarizationAgent(mesa.Agent):
         Returns: (int) The node ID containing an agent to attempt a bond with, which is currently not
         bonded to the agent.
         """
-        assert isinstance(self.model, PolarizationModel)
-
-        targetID = self.random.choice(self.nonBondedNodes())
+        nonBonded = self.nonBondedNodes()
+        if not nonBonded:
+            return None
+        targetID = self.random.choice(nonBonded)
         return targetID
     
     def weightedSample(self) -> int:
@@ -193,13 +187,12 @@ class PolarizationAgent(mesa.Agent):
         Returns: (int) The node ID containing an agent to attempt a bond with, which is currently not
         bonded to the agent.
         """
-        assert isinstance(self.model, PolarizationModel)
 
-        neighbors = self.model.graph.get_neighbors(self.unique_id)  # Get direct neighbors
+        neighbors = self.model.space.get_neighbors(self.unique_id)  # Get direct neighbors
         neighbors_of_neighbors = set()  # Set to store neighbors of neighbors
 
         for neighbor in neighbors:
-            neighbors_of_neighbors.update(self.model.graph.get_neighbors(neighbor))  # Add neighbors of neighbors to set
+            neighbors_of_neighbors.update(self.model.space.get_neighbors(neighbor))  # Add neighbors of neighbors to set
 
         # Remove nodes already bonded to self
         non_bonded_nodes = [node_id for node_id in neighbors_of_neighbors if node_id not in self.model.graph.neighbors(self.unique_id)]
@@ -234,13 +227,13 @@ class PolarizationAgent(mesa.Agent):
         nonBonded = [i for i in range(self.model.nAgents) if i not in neighbor_nodes if i != self.unique_id]
 
         return nonBonded
-    
-class IdeologueAgent(PolarizationAgent):
-    def __init__(self, unique_id: int, model: PolarizationModel, opinion: float) -> None:
-        super().__init__(unique_id, model, opinion, conformity=0.0, tolerance=0.0, targetDegree=-1)
-        """Ideologues have fixed opinions (e.g., -1 or +1), no conformity, and zero tolerance."""
 
-class FollowerAgent(PolarizationAgent):
-    def __init__(self, unique_id: int, model: PolarizationModel, opinion: float, conformity: float, tolerance: float) -> None:
-        super().__init__(unique_id, model, opinion, conformity, tolerance, targetDegree=-1)
-        """Followers have varying opinions, conformity, and tolerance."""
+#class IdeologueAgent(PolarizationAgent):
+#    def __init__(self, unique_id: int, model: PolarizationModel, opinion: float) -> None:
+#        super().__init__(unique_id, model, opinion, conformity=0.0, tolerance=0.0, targetDegree=-1)
+#        """Ideologues have fixed opinions (e.g., -1 or +1), no conformity, and zero tolerance."""
+
+#class FollowerAgent(PolarizationAgent):
+#    def __init__(self, unique_id: int, model: PolarizationModel, opinion: float, conformity: float, tolerance: float) -> None:
+#        super().__init__(unique_id, model, opinion, conformity, tolerance, targetDegree=-1)
+#        """Followers have varying opinions, conformity, and tolerance."""
