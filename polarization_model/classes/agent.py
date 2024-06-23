@@ -153,12 +153,17 @@ class PolarizationAgent(mesa.Agent):
         if targetID is None:
             return
         
-        # TODO: Better "click" function in `agent behavior.md` current iteration is heavily flawed
-        PLACEHOLDER = 1
-        pClick = PLACEHOLDER
+        targetAgent = self.model.scheduler.agents[targetID]
+        assert isinstance(targetAgent, PolarizationAgent)
+
+        dOpinion = abs(self.opinion - targetAgent.opinion) / self.model.opinionDist
+        
+        pClick = 1 - (1 - (min(self.tolerance, targetAgent.tolerance))) * dOpinion
         
         if self.random.random() < pClick:
             self.pendingInteraction.append((+1, targetID))
+        
+        
 
     def sampleAcquaintance(self) -> int:
         """
