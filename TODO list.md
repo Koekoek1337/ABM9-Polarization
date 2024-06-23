@@ -1,10 +1,10 @@
 #### Implementation
-1. Implement [[Agent Properties]] and [[Agent Behavior]]
-3. Implement system visualization
 4. Implement snapshotting
-5. Implement agent property seeding
+5. Visualization
 6. Implement system topologies
 7. Implement system analysis tools
+    - Entropy
+    - etc
 8. Optimization?
 
 #### Experimentation
