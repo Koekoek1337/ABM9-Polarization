@@ -165,7 +165,7 @@ class PolarizationAgent(mesa.Agent):
         pClick = 1 - (1 - (min(self.tolerance, targetAgent.tolerance))) * dOpinion
         
         if self.random.random() < pClick:
-            self.pendingInteraction.append((+1, targetID))
+            self.pendingInteraction.append((MAKE, targetID))
         
 
 
