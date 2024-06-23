@@ -141,3 +141,12 @@ class PolarizationModel(mesa.Model):
             opinions[agent.unique_id] = agent.opinion
 
         return opinions
+    
+    def lockDegree(self, target: int=None):
+        
+        for agent in self.scheduler.agents:
+            assert isinstance(agent, PolarizationAgent)
+            if target is None:
+                agent.targetDegree = nx.degree(self.graph, agent.unique_id)
+            else:
+                agent.targetDegree = target
