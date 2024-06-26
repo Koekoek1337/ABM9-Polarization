@@ -18,7 +18,6 @@ class Visualizer():
         assert isinstance(ax, plt.Axes)
         self.ax = ax
 
-        # 创建一个从-1到1的颜色映射，-1为深蓝色，1为深红色，0为灰色
         self.cmap = mcolors.LinearSegmentedColormap.from_list(
             "opinion_cmap", ["blue", "grey", "red"])
 
@@ -36,8 +35,8 @@ class Visualizer():
         nx.draw_circular(self.graph, node_color=cmap, ax=self.ax)
 
     def colorpicker(self, opinion):
-        # 使用归一化将opinion值映射到颜色映射范围[0, 1]
-        return self.cmap((opinion + 1) / 2)  # 将opinion从[-1, 1]范围映射到[0, 1]
+        
+        return self.cmap((opinion + 1) / 2)  
 
     def _frame(self, framenum):
         self.ax.clear()
@@ -51,8 +50,6 @@ class Visualizer():
         self.ani = FuncAnimation(self.fig, self._frame, frames=nFrames, interval=300 / fps, repeat = False)
         plt.show()
         self.ani.save(f"test.gif")
-
-
 
 # import matplotlib.pyplot as plt
 # import matplotlib.colors as mcolors
