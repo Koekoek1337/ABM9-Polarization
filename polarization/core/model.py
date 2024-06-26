@@ -9,7 +9,7 @@ from networkx.algorithms.community import greedy_modularity_communities
 from networkx.algorithms.community.quality import modularity
 from networkx.algorithms.cluster import average_clustering
 import numpy as np
-from spatialentropy import leibovici_entropy, altieri_entropy
+#from spatialentropy import leibovici_entropy, altieri_entropy
 
 random.seed(711)
 
@@ -150,8 +150,8 @@ class CityModel(Model):
                 "movers_per_step": lambda m: m.movers_per_step,
                 "cluster_coefficient": self.calculate_clustercoef,
                 "edges": self.get_graph_dict,
-                "leibovici_entropy_index": self.calculate_l_entropyindex,
-                "altieri_entropy_index": self.calculate_a_entropyindex,
+                # "leibovici_entropy_index": self.calculate_l_entropyindex,
+                # "altieri_entropy_index": self.calculate_a_entropyindex,
             },
             agent_reporters={
                 "opinion": lambda x: x.opinion,
@@ -173,59 +173,59 @@ class CityModel(Model):
         graph_dict = nx.convert.to_dict_of_dicts(self.graph)
         return graph_dict
 
-    def calculate_l_entropyindex(self):
-        agent_infolist = [[agent.pos, agent.opinion] for agent in self.schedule.agents]
-        points = []
-        types = []
+    # def calculate_l_entropyindex(self):
+    #     agent_infolist = [[agent.pos, agent.opinion] for agent in self.schedule.agents]
+    #     points = []
+    #     types = []
 
-        for i in range(len(agent_infolist)):
-            points.append([agent_infolist[i][0][0], agent_infolist[i][0][1]])
+    #     for i in range(len(agent_infolist)):
+    #         points.append([agent_infolist[i][0][0], agent_infolist[i][0][1]])
 
-        for i in agent_infolist:
-            if i[1] < 3:
-                types.append("left")
-            elif 3 < i[1] < 7:
-                types.append("middle")
-            else:
-                types.append("right")
+    #     for i in agent_infolist:
+    #         if i[1] < 3:
+    #             types.append("left")
+    #         elif 3 < i[1] < 7:
+    #             types.append("middle")
+    #         else:
+    #             types.append("right")
 
-        points = np.array(points)
-        types = np.array(types)
+    #     points = np.array(points)
+    #     types = np.array(types)
 
-        e = leibovici_entropy(points, types, d=2)
-        e_entropyind = e.entropy
-        return e_entropyind
+    #     e = leibovici_entropy(points, types, d=2)
+    #     e_entropyind = e.entropy
+    #     return e_entropyind
 
-    def calculate_a_entropyindex(self):
-        agent_infolist = [[agent.pos, agent.opinion] for agent in self.schedule.agents]
-        points = []
-        types = []
+    # def calculate_a_entropyindex(self):
+    #     agent_infolist = [[agent.pos, agent.opinion] for agent in self.schedule.agents]
+    #     points = []
+    #     types = []
 
-        for i in range(len(agent_infolist)):
-            points.append([agent_infolist[i][0][0], agent_infolist[i][0][1]])
+    #     for i in range(len(agent_infolist)):
+    #         points.append([agent_infolist[i][0][0], agent_infolist[i][0][1]])
 
-        for i in agent_infolist:
-            if i[1] < 3:
-                types.append("left")
-            elif 3 < i[1] < 7:
-                types.append("middle")
-            else:
-                types.append("right")
+    #     for i in agent_infolist:
+    #         if i[1] < 3:
+    #             types.append("left")
+    #         elif 3 < i[1] < 7:
+    #             types.append("middle")
+    #         else:
+    #             types.append("right")
 
-        points = np.array(points)
-        types = np.array(types)
+    #     points = np.array(points)
+    #     types = np.array(types)
 
-        a = altieri_entropy(points, types, cut=2)
-        a_entropyind = a.entropy
-        return a_entropyind
+    #     a = altieri_entropy(points, types, cut=2)
+    #     a_entropyind = a.entropy
+    #     return a_entropyind
 
     def initialize_population(self):
-        for cell in self.grid.coord_iter():
-            x = cell[1]
-            y = cell[2]
+        for (content, (x, y)) in self.grid.coord_iter():
+        # for cell in self.grid.coord_iter():
+        #     x, y = cell[1], cell[2]
             if self.random.uniform(0, 1) < self.density:
                 agent = Resident(self.n_agents, self, (x, y))
-                self.grid.position_agent(agent, *(x, y))
+                self.grid.place_agent(agent, (x, y))
                 self.schedule.add(agent)
                 self.n_agents += 1
 

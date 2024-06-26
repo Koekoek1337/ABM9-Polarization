@@ -1,4 +1,7 @@
 """This script plots the data generated from the experiments.py file"""
+import os
+import re
+import hashlib
 import numpy as np
 import pandas as pd
 import networkx as nx
@@ -8,9 +11,9 @@ import seaborn as sns;
 sns.set_theme()
 sns.set_color_codes()
 
-from polarization.core.model import CityModel
-from polarization.core.plot_graph import plot_single_graph
-from polarization.core.plot_grid import grid_plot
+from model import CityModel
+from plot_graph import plot_single_graph
+from plot_grid import grid_plot
 
 def plot_errorHue(mean_list, std_list, label, start=0,sample_data=None, sample_style='-r', ax=None):
     """Plotting the information from all repetitions of a run.
@@ -67,6 +70,11 @@ def run_experiment(iterations, stepcount, experiment):
         agent_dfs.append( model.datacollector.get_agent_vars_dataframe())
     return agent_dfs, model_dfs
 
+def sanitize_filename(filename):
+    return re.sub(r'[\\/*?:"<>|]', "_", filename)
+
+def hash_filename(filename):
+    return hashlib.md5(filename.encode()).hexdigest()
 
 def plot_experiment(agent_dfs, model_dfs, stepcount, experiment):
     """ Plots a 2x3 grid of visual results from an experiment.
@@ -86,7 +94,7 @@ def plot_experiment(agent_dfs, model_dfs, stepcount, experiment):
     for si in range(samples):
         sample = agent_dfs[si], model_dfs[si]
         model_df = pd.concat(model_dfs)
-        model_df = model_df.drop(columns=['edges', 'leibovici_entropy_index'])
+        model_df = model_df.drop(columns=['edges'])#, 'leibovici_entropy_index'])
         agent_df = pd.concat(agent_dfs)
         agg_model_df = model_df.groupby(by='step').aggregate(['std', 'mean'])
 
@@ -102,7 +110,7 @@ def plot_experiment(agent_dfs, model_dfs, stepcount, experiment):
         # Modularity
         plot_errorHue(agg_model_df[headers[0]]['mean'], agg_model_df[headers[0]]['std'], ax=ax[0][1], sample_data=sample[1][headers[0]], label=headers[0].title().replace("_"," "))
         # Entropy
-        plot_errorHue(agg_model_df[headers[3]]['mean'], agg_model_df[headers[3]]['std'], ax=ax[1][1], sample_data=sample[1][headers[3]], label=headers[3].title().replace("_"," "))
+        # plot_errorHue(agg_model_df[headers[3]]['mean'], agg_model_df[headers[3]]['std'], ax=ax[1][1], sample_data=sample[1][headers[3]], label=headers[3].title().replace("_"," "))
         # Movers
         plot_errorHue(agg_model_df[headers[1]]['mean'][1:], agg_model_df[headers[1]]['std'][1:], ax=ax[0][2], sample_data=sample[1][headers[1]][1:], label=headers[1].title().replace("_"," "), start=1)
         # Opinion Distribution
@@ -114,6 +122,10 @@ def plot_experiment(agent_dfs, model_dfs, stepcount, experiment):
         ax[1][2].set( xlabel="Opinion", title="Sample Opinion Distribution")
 
         plt.tight_layout()
+        
+        # Create directory if it doesn't exist
+        if not os.path.exists("figures"):
+            os.makedirs("figures")
 
         values =experiment["values"]
         indices=PARAMS_NAMES
@@ -121,4 +133,7 @@ def plot_experiment(agent_dfs, model_dfs, stepcount, experiment):
         filename = experiment["name"]
         for i in range(len(values)):
             filename = filename + f"{indices[i]}={values[i]}"
-        plt.savefig(f"figures/{filename}{si}.svg")
+            
+        sanitized_filename = sanitize_filename(filename)
+        hashed_filename = hash_filename(sanitized_filename)
+        plt.savefig(f"figures/{hashed_filename}{si}.svg")

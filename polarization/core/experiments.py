@@ -9,7 +9,7 @@ experiments = [
     # {"name":"default_small",            "values":[10, 0.8, 2, 4, 1, 0.8, 5, 2, 0.8]},
     # {"name":"default_small_dens",       "values":[10, 0.9, 2, 4, 1, 0.8, 5, 2, 0.8]},
     # {"name":"default_average",          "values":[20, 0.8, 2, 4, 1, 0.8, 5, 2, 0.8]},
-    # {"name":"default_average_dens",     "values":[20, 0.9, 2, 4 ,1, 0.8, 5, 2, 0.8]},  # MAIN COMPARIS}N
+    # {"name":"default_average_dens",     "values":[20, 0.9, 2, 4 ,1, 0.8, 5, 2, 0.8]},  # MAIN COMPARISON
     # {"name":"default_large",            "values":[30, 0.8, 2, 4, 1, 0.8, 5, 2, 0.8]},
     # {"name":"default_large_dens",       "values":[30, 0.95,2, 4, 1, 0.8, 5, 2, 0.8]},
     # {"name":"default_extra_large_dens", "values":[40, 0.95,2, 4, 1, 0.8, 5, 2, 0.8]},
