@@ -121,4 +121,4 @@ def plot_experiment(agent_dfs, model_dfs, stepcount, experiment):
         filename = experiment["name"]
         for i in range(len(values)):
             filename = filename + f"{indices[i]}={values[i]}"
-        plt.savefig(f"figures1/{filename}{si}.svg")
+        plt.savefig(f"figures/{filename}{si}.svg")
