@@ -7,7 +7,7 @@
 experiments = [
     # {"name":"default_small",            "values":[10, 0.8, 2, 4, 1, 0.8, 2, 0.2, 0.8]},
     # {"name":"default_small_dens",       "values":[10, 0.9, 2, 4, 1, 0.8, 5, 0.2, 0.8]},
-    {"name":"default_average",          "values":[15, 0.8, 2, 1, 0.2, 0.8, 5, 0.2, 0.8]},
+    {"name":"default_average",          "values":[20, 0.8, 2, 20, 0.08, 0.8, 5, 0.1, 0.8]},
     # {"name":"default_average_dens",     "values":[20, 0.9, 2, 4 ,1, 0.8, 5, 0.2, 0.8]},  # MAIN COMPARISON
     # {"name":"default_large",            "values":[30, 0.8, 2, 4, 1, 0.8, 5, 0.2, 0.8]},
     # {"name":"default_large_dens",       "values":[30, 0.95,2, 4, 1, 0.8, 5, 0.2, 0.8]},
@@ -20,7 +20,7 @@ experiments = [
 ]
 
 from experiment_run import run_experiment, plot_experiment
-stepcount = 500 # Can change to include more or lesser steps
+stepcount = 100 # Can change to include more or lesser steps
 iterations = 1 # Can change to include multiple iterations
 for experiment in experiments:
     agent_dfs, model_dfs = run_experiment(iterations, stepcount, experiment)

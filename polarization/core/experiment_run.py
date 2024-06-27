@@ -114,7 +114,7 @@ def plot_experiment(agent_dfs, model_dfs, stepcount, experiment):
         # Movers
         plot_errorHue(agg_model_df[headers[1]]['mean'][1:], agg_model_df[headers[1]]['std'][1:], ax=ax[0][2], sample_data=sample[1][headers[1]][1:], label=headers[1].title().replace("_"," "), start=1)
         # Opinion Distribution
-        ax[1][2].hist(sample[0].loc[[stepcount], ["opinion"]], color='r', density = True)
+        ax[1][2].hist(sample[0].loc[[stepcount], ["opinion"]], color='r', density = True, bins = 5)
 
         ax[0][1].set( xlabel="step", title="Modularity")
         ax[1][1].set( xlabel="step", title="Entropy")
