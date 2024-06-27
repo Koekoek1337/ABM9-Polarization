@@ -14,14 +14,19 @@ import numpy as np
 random.seed(711)
 
 class Resident(Agent):
-    def __init__(self, unique_id, model, pos):
+    def __init__(self, unique_id, model, pos, fixed_opinion=False):
         super().__init__(unique_id, model)
         self.pos = pos
-        self.opinion = self.random.uniform(0,10)
-        self.vulnerability = self.random.uniform(0,0.5)
-        self.weight_own = 1 - self.vulnerability
-        self.weight_socials = self.model.social_factor * self.vulnerability
-        self.weight_neighbors = (1 - self.model.social_factor) * self.vulnerability
+        # self.fixed_opinion = fixed_opinion  # Flag to indicate if opinion should remain fixed
+        # if fixed_opinion:
+        #     self.opinion = random.choice([0, 1])  # Fixed opinion of 0 or 1
+        # else:
+        #     self.opinion = self.random.uniform(0, 1)
+        self.opinion = self.random.uniform(0, 1)
+        self.conformity = self.random.uniform(0.4, 0.8)
+        self.weight_own = 1 - self.conformity
+        self.weight_socials = self.model.social_factor * self.conformity
+        self.weight_neighbors = (1 - self.model.social_factor) * self.conformity
 
     @property
     def socials_ids(self):
@@ -64,6 +69,18 @@ class Resident(Agent):
         return avg_social, avg_nbr
 
     def update_opinion(self):
+        # if not self.fixed_opinion:  # Only update if opinion is not fixed
+        #     social_infl, nbr_infl = self.get_external_influences()
+        #     new_opinion = self.opinion
+
+        #     if social_infl != 0 and nbr_infl != 0:
+        #         new_opinion = (self.weight_own * self.opinion) + (self.weight_socials * social_infl) + (self.weight_neighbors * nbr_infl)
+        #     elif social_infl == 0 and nbr_infl != 0:
+        #         new_opinion = (self.weight_own * self.opinion) + ((1 - self.weight_own) * nbr_infl)
+        #     elif nbr_infl == 0 and social_infl != 0:
+        #         new_opinion = (self.weight_own * self.opinion) + ((1 - self.weight_own) * social_infl)
+
+        #     self.opinion = new_opinion
         social_infl, nbr_infl = self.get_external_influences()
         new_opinion = self.opinion
 
@@ -101,7 +118,10 @@ class Resident(Agent):
             self.consider_connection(potential, method="REMOVE")
 
     def consider_connection(self, potential_agent, method):
-        p_ij = 1 / (1 + np.exp(self.model.fermi_alpha * (abs(self.opinion - potential_agent.opinion) - self.model.fermi_b)))
+        # p_ij = 1 / (1 + np.exp(self.model.fermi_alpha * (abs(self.opinion - potential_agent.opinion) - self.model.fermi_b)))
+        # print(p_ij)
+        
+        p_ij = 0.45 # For now, hange to vary the probability of connection, higher => higher connections
 
         if method == "ADD":
             if p_ij > random.random():
@@ -117,15 +137,27 @@ class Resident(Agent):
         if happiness < self.model.happiness_threshold:
             self.model.grid.move_to_empty(self)
             self.model.movers_per_step += 1
+            
+    def connect_different_opinions(self):
+        """To connect agents with different opinions, not used in the current model.
+        """
+        unconnected_agents = [agent for agent in self.model.schedule.agents if agent.unique_id != self.unique_id and agent.unique_id not in self.socials_ids]
+        potential_connections = [agent for agent in unconnected_agents if abs(agent.opinion - self.opinion) >= self.model.opinion_max_diff*2] # To change this part to connect agents with differing opinions
+
+        if potential_connections:
+            potential = random.choice(potential_connections)
+            self.consider_connection(potential_agent=potential, method="ADD")
 
     def step(self):
         self.new_social()
+        self.connect_different_opinions()  # To connect agents with different opinions
         self.remove_social()
         self.move_pos()
         self.update_opinion()
+        
 
 class CityModel(Model):
-    def __init__(self, sidelength=20, density=0.8, m_barabasi=2, fermi_alpha=5, fermi_b=3, social_factor=0.8, connections_per_step=5, opinion_max_diff=2, happiness_threshold=0.8):
+    def __init__(self, sidelength=20, density=0.8, m_barabasi=2, fermi_alpha=5, fermi_b=3, social_factor=0.8, connections_per_step=5, opinion_max_diff=0.2, happiness_threshold=0.8):
         self.sidelength = sidelength
         self.density = density
         self.m_barabasi = m_barabasi
@@ -220,6 +252,25 @@ class CityModel(Model):
     #     return a_entropyind
 
     def initialize_population(self):
+        # # Calculate number of agents to have fixed opinion
+        # num_agents_fixed_opinion = int(self.n_agents * 0.01)  # 1% of total agents
+
+        # # List of all agent positions to choose from
+        # agent_positions = list(self.grid.coord_iter())
+
+        # # Shuffle the agent positions to randomize selection
+        # random.shuffle(agent_positions)
+
+        # for idx, (content, (x, y)) in enumerate(agent_positions):
+        #     if idx < num_agents_fixed_opinion:
+        #         agent = Resident(self.n_agents, self, (x, y), fixed_opinion=True)
+        #     else:
+        #         agent = Resident(self.n_agents, self, (x, y), fixed_opinion=False)
+
+        #     self.grid.place_agent(agent, (x, y))
+        #     self.schedule.add(agent)
+        #     self.n_agents += 1
+        
         for (content, (x, y)) in self.grid.coord_iter():
         # for cell in self.grid.coord_iter():
         #     x, y = cell[1], cell[2]

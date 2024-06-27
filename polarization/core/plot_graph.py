@@ -36,17 +36,17 @@ def create_graph(agent_df, model_df, graph_axes= [], colormap="bwr", layout=nx.s
 
     for node in G_last: # same IDs in both graphs
         opinion_first = agents_firststep['opinion'][node]
-        rgba = cmap(opinion_first/10) # maps from 0 to 1, so need to normalize
+        rgba = cmap(opinion_first) # maps from 0 to 1, so no need to normalize
         color_map_first.append(rgba)
 
         opinion_last = agents_laststep['opinion'][node]
-        rgba = cmap(opinion_last/10) # maps from 0 to 1, so need to normalize
+        rgba = cmap(opinion_last) # maps from 0 to 1, so no need to normalize
         color_map_last.append(rgba)
 
 # plot
     if len(graph_axes) == 0:
         fig, graph_axes = plt.subplots(1,2)
-        cbar = fig.colorbar(ScalarMappable(norm=Normalize(0,1), cmap=cmap), orientation='horizontal',label="Opinion", ticks=[0,1])
+        cbar = fig.colorbar(ScalarMappable(norm=Normalize(0,1), cmap=cmap), orientation='horizontal',label="Opinion", ticks=[-1,1])
         cbar.ax.set_xticklabels(['Far left', 'Far right'])
 
     nx.draw(G_init, ax=graph_axes[0], node_size=20, node_color=color_map_first, width=0.3, edgecolors='k', pos=layout(G_init))
@@ -79,7 +79,7 @@ def plot_single_graph(model_df, agent_df, colormap = "bwr",layout=nx.spring_layo
     cmap = plt.get_cmap(colormap)
     for node in G_last:
         opinion_last = agents_laststep['opinion'][node]
-        rgba = cmap(opinion_last/10) # maps from 0 to 1, so need to normalize!
+        rgba = cmap(opinion_last) # maps from 0 to 1, so no need to normalize!
         color_map_last.append(rgba)
 
     if ax == None:
