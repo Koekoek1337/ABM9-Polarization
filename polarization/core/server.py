@@ -5,7 +5,7 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 
-from model import CityModel, Resident
+from polarization.core.model import CityModel, Resident
 
 def agent_portrayal(agent):
     if agent == None:

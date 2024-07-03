@@ -9,7 +9,7 @@ from networkx.algorithms.community import greedy_modularity_communities
 from networkx.algorithms.community.quality import modularity
 from networkx.algorithms.cluster import average_clustering
 import numpy as np
-#from spatialentropy import leibovici_entropy, altieri_entropy
+from spatialentropy import leibovici_entropy, altieri_entropy
 
 random.seed(711)
 
@@ -21,9 +21,9 @@ class Resident(Agent):
         if fixed_opinion:
             self.opinion = fixed_opinion_value #random.choice([0, 1])  # Fixed opinion of 0 or 1
         else:
-            self.opinion = self.random.uniform(0, 1)
+            self.opinion = self.random.uniform(0, 10)
         #self.opinion = self.random.uniform(0, 1)
-        self.conformity = 0.8 #self.random.uniform(0.4, 0.8)
+        self.conformity = 0.2 #self.random.uniform(0.4, 0.8)
         self.weight_own = 1 - self.conformity
         self.weight_socials = self.model.social_factor * self.conformity
         self.weight_neighbors = (1 - self.model.social_factor) * self.conformity
@@ -122,7 +122,7 @@ class Resident(Agent):
         # p_ij = 1 / (1 + np.exp(self.model.fermi_alpha * (abs(self.opinion - potential_agent.opinion) - self.model.fermi_b)))
         # print(p_ij)
         
-        p_ij = 0.55 # For now, hange to vary the probability of connection, higher => higher connections
+        p_ij = 0.50 # For now, hange to vary the probability of connection, higher => higher connections
 
         if method == "ADD":
             if p_ij > random.random():
@@ -155,12 +155,10 @@ class Resident(Agent):
 
     def step(self):
         self.new_social()
-        self.connect_different_opinions()  # To connect agents with different opinions
-        self.remove_social()
         # self.connect_different_opinions()  # To connect agents with different opinions
+        self.remove_social()
         self.move_pos()
         self.update_opinion()
-        
 
 class CityModel(Model):
     def __init__(self, sidelength=20, density=0.8, m_barabasi=2, fermi_alpha=5, fermi_b=3, social_factor=0.8, connections_per_step=5, opinion_max_diff=0.2, happiness_threshold=0.8):
@@ -172,7 +170,7 @@ class CityModel(Model):
         self.social_factor = social_factor
         self.connections_per_step = connections_per_step
         self.opinion_max_diff = opinion_max_diff
-        self.happiness_threshold = happiness_threshold
+        # self.happiness_threshold = happiness_threshold
 
         self.schedule = RandomActivation(self)
         self.movers_per_step = 0
@@ -188,8 +186,8 @@ class CityModel(Model):
                 "movers_per_step": lambda m: m.movers_per_step,
                 "cluster_coefficient": self.calculate_clustercoef,
                 "edges": self.get_graph_dict,
-                # "leibovici_entropy_index": self.calculate_l_entropyindex,
-                # "altieri_entropy_index": self.calculate_a_entropyindex,
+                "leibovici_entropy_index": self.calculate_l_entropyindex,
+                "altieri_entropy_index": self.calculate_a_entropyindex,
             },
             agent_reporters={
                 "opinion": lambda x: x.opinion,
@@ -211,57 +209,55 @@ class CityModel(Model):
         graph_dict = nx.convert.to_dict_of_dicts(self.graph)
         return graph_dict
 
-    # def calculate_l_entropyindex(self):
-    #     agent_infolist = [[agent.pos, agent.opinion] for agent in self.schedule.agents]
-    #     points = []
-    #     types = []
+    def calculate_l_entropyindex(self):
+        agent_infolist = [[agent.pos, agent.opinion] for agent in self.schedule.agents]
+        points = []
+        types = []
 
-    #     for i in range(len(agent_infolist)):
-    #         points.append([agent_infolist[i][0][0], agent_infolist[i][0][1]])
+        for i in range(len(agent_infolist)):
+            points.append([agent_infolist[i][0][0], agent_infolist[i][0][1]])
 
-    #     for i in agent_infolist:
-    #         if i[1] < 3:
-    #             types.append("left")
-    #         elif 3 < i[1] < 7:
-    #             types.append("middle")
-    #         else:
-    #             types.append("right")
+        for i in agent_infolist:
+            if i[1] < 5:
+                types.append("left")
+            else:
+                types.append("right")
 
-    #     points = np.array(points)
-    #     types = np.array(types)
+        points = np.array(points)
+        types = np.array(types)
 
-    #     e = leibovici_entropy(points, types, d=2)
-    #     e_entropyind = e.entropy
-    #     return e_entropyind
+        e = leibovici_entropy(points, types, d=2)
+        e_entropyind = e.entropy
+        return e_entropyind
 
-    # def calculate_a_entropyindex(self):
-    #     agent_infolist = [[agent.pos, agent.opinion] for agent in self.schedule.agents]
-    #     points = []
-    #     types = []
+    def calculate_a_entropyindex(self):
+        agent_infolist = [[agent.pos, agent.opinion] for agent in self.schedule.agents]
+        points = []
+        types = []
 
-    #     for i in range(len(agent_infolist)):
-    #         points.append([agent_infolist[i][0][0], agent_infolist[i][0][1]])
+        for i in range(len(agent_infolist)):
+            points.append([agent_infolist[i][0][0], agent_infolist[i][0][1]])
 
-    #     for i in agent_infolist:
-    #         if i[1] < 3:
-    #             types.append("left")
-    #         elif 3 < i[1] < 7:
-    #             types.append("middle")
-    #         else:
-    #             types.append("right")
+        for i in agent_infolist:
+            if i[1] < 5:
+                types.append("left")
+            else:
+                types.append("right")
 
-    #     points = np.array(points)
-    #     types = np.array(types)
+        points = np.array(points)
+        types = np.array(types)
 
-    #     a = altieri_entropy(points, types, cut=2)
-    #     a_entropyind = a.entropy
-    #     return a_entropyind
+        a = altieri_entropy(points, types, cut=2)
+        a_entropyind = a.entropy
+        return a_entropyind
+
 
     def initialize_population(self):
         num_agents = int(self.sidelength * self.sidelength * self.density)
         fixed_opinion_counter = 0  # Counter to alternate fixed opinions between 0 and 1
 
-        for (content, (x, y)) in self.grid.coord_iter():
+        for cell in self.grid.coord_iter():
+            x, y = cell[1], cell[2]
             if (x is not None) and (y is not None):
                 if self.random.uniform(0, 1) < self.density:
                     if random.random() < 0.01:  # Approximately 1% of agents have fixed_opinion=True
@@ -275,14 +271,6 @@ class CityModel(Model):
                     self.schedule.add(agent)
                     self.n_agents += 1
         
-        # for (content, (x, y)) in self.grid.coord_iter():
-        # # for cell in self.grid.coord_iter():
-        # #     x, y = cell[1], cell[2]
-        #     if self.random.uniform(0, 1) < self.density:
-        #         agent = Resident(self.n_agents, self, (x, y))
-        #         self.grid.place_agent(agent, (x, y))
-        #         self.schedule.add(agent)
-        #         self.n_agents += 1
 
     def step(self):
         self.schedule.step()
