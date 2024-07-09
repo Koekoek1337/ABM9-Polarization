@@ -23,7 +23,7 @@ class Resident(Agent):
         else:
             self.opinion = self.random.uniform(0, 10)
         #self.opinion = self.random.uniform(0, 1)
-        self.conformity = 0.2 #self.random.uniform(0.4, 0.8)
+        self.conformity = 0.8 #self.random.uniform(0.4, 0.8)
         self.weight_own = 1 - self.conformity
         self.weight_socials = self.model.social_factor * self.conformity
         self.weight_neighbors = (1 - self.model.social_factor) * self.conformity

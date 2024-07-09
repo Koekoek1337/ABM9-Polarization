@@ -6,17 +6,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 from SALib.analyze import sobol
-plt.style.use('seaborn')
+plt.style.use("default")
 
 problem = {
     'num_vars':5,
     'names':['Fermi-Dirac alpha','Fermi-Dirac b', 'Social Network Influence',
-    'Max. difference in opinion', 'Happiness Threshold'],
+    'Max. difference in opinion','happiness_threshold'],
     'bounds':[[0,4],[0,6],[0,1],[0,4],[0,1]],
 }
 #set up data, loading from all csv files
 DATA_DIR = "./data/sobol/"
-datafiles = [dir for dir in os.listdir(DATA_DIR) if dir.startswith("sobol3")]
+datafiles = [dir for dir in os.listdir(DATA_DIR) if dir.startswith("combined_results_maurits2")]
 
 dataframes = []
 for dir in datafiles:
@@ -49,49 +49,49 @@ si_resident_entropy = sobol.analyze(problem, sobol_df['Altieri Entropy Index'].v
 
 
 def plot_index(s, params, i, ax=None, title=''):
-    """
-    Creates a plot for Sobol sensitivity analysis that shows the contributions
-    of each parameter to the global sensitivity.
+    # Exclude 'happiness_threshold' from the plot
+    if 'happiness_threshold' in params:
+        index_to_exclude = params.index('happiness_threshold')
+        params = [p for j, p in enumerate(params) if j != index_to_exclude]
 
-    Args:
-        s (dict): dictionary {'S#': dict, 'S#_conf': dict} of dicts that hold
-            the values for a set of parameters
-        params (list): the parameters taken from s
-        i (str): string that indicates what order the sensitivity is.
-        title (str): title for the plot
-    """
+        if i == '2':
+            p = len(params)
+            combinations_params = list(combinations(range(p+1), 2))  # include original count
+            indices = s['S' + i].reshape((p+1)**2)
+            errors = s['S' + i + '_conf'].reshape((p+1)**2)
+            
+            # Filtering out indices and errors that include the excluded parameter
+            indices = [indices[j * (p + 1) + k] for j, k in combinations_params if j != index_to_exclude and k != index_to_exclude]
+            errors = [errors[j * (p + 1) + k] for j, k in combinations_params if j != index_to_exclude and k != index_to_exclude]
+        else:
+            indices = np.delete(s['S'+i], index_to_exclude)
+            errors = np.delete(s['S'+i+'_conf'], index_to_exclude)
 
-    if i == '2':
-        p = len(params)
-        params = list(combinations(params,2))
-        indices = s['S' + i].reshape((p**2))
-        indices = indices[~np.isnan(indices)]
-        errors = s['S'+ i + '_conf'].reshape((p**2))
-        errors = errors[~np.isnan(errors)]
     else:
-        indices = s['S'+i]
-        errors = s['S'+ i + '_conf']
-        # plt.figure()
+        if i == '2':
+            p = len(params)
+            indices = s['S' + i].reshape((p**2))
+            indices = indices[~np.isnan(indices)]
+            errors = s['S'+ i + '_conf'].reshape((p**2))
+            errors = errors[~np.isnan(errors)]
+        else:
+            indices = s['S'+i]
+            errors = s['S'+ i + '_conf']
 
-    #set some aesthetics here
-    l=len(indices)
-    # plt.ylim([-0.2,l-1+0.2])
-    # plt.xlim(-0.1, 1.1)
-
-    if ax == None:
+    if ax is None:
         fig, ax = plt.subplots()
+    l = len(indices)
     ax.set_yticks(range(l), params)
     ax.set(title=title)
-    ax.errorbar(indices, range(l), xerr=errors, linestyle='None', marker='o', capsize=2)
-    ax.axvline(0,c='k')
+    ax.errorbar(indices, range(l), xerr=errors, linestyle='None', marker='o', capsize=5)
+    ax.axvline(0, c='k')
+    ax.grid(True)
     plt.tight_layout()
-    # plt.savefig("filename.png")
 
-#Plotting first and total order SA for Modularity and Entropy
-fig, ax = plt.subplots(2,2, figsize=(9,5), sharey=True, sharex=True)
-plot_index(si_resident_modularity , problem["names"],   i="1",ax=ax[0][0],title= "1st Order Sensitivity\nModularity")
-plot_index(si_resident_entropy , problem["names"],      i="1",ax=ax[1][0],title= "Entropy")
-plot_index(si_resident_modularity , problem["names"],   i="T",ax=ax[0][1],title= "Total S\nModularity")
-plot_index(si_resident_entropy , problem["names"],      i="T",ax=ax[1][1],title= "Entropy")
-#plt.savefig("figures/GSA.svg")
-
+# Adjust the plotting calls to remove 'happiness_threshold'
+fig, ax = plt.subplots(2, 2, figsize=(9, 5), sharey=True, sharex=True)
+plot_index(si_resident_modularity, problem["names"], i="1", ax=ax[0][0], title="1st Order Sensitivity\nModularity")
+plot_index(si_resident_entropy, problem["names"], i="1", ax=ax[1][0], title="1st Order Sensitivity\nEntropy")
+plot_index(si_resident_modularity, problem["names"], i="T", ax=ax[0][1], title="Total Order Sensitivity\nModularity")
+plot_index(si_resident_entropy, problem["names"], i="T", ax=ax[1][1], title="Total Order Sensitivity\nEntropy")
+plt.savefig("figures/GSA4.svg")
