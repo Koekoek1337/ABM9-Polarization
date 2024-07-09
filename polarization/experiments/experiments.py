@@ -1,7 +1,7 @@
 """This file generates the results of a set of Experiments with the model
     """
 # order of the parameters:
-# sidelength, density, m_barabasi, fermi_alpha, fermi_b, social_factor, connections per step, opinion_max_diff, happiness_threshold
+# width, density, network_m, fermi_alpha, fermi_beta, connection_influence, target_connections, opinion_threshold, happiness_threshold
 
 
 experiments = [

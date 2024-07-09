@@ -5,7 +5,7 @@
 # import numpy as np
 
 # from polarization.mesa_fix.batchrunner import BatchRunnerMP
-# from polarization.core.model import CityModel
+# from polarization.core.model import PolarizationModel
 
 # # param_Nina      = param_values[0:160]
 # # param_Maurits   = param_values[160:320]
@@ -29,13 +29,13 @@
 # # We define our variables and bounds
 # problem = {
 #     'num_vars':5,
-#     'names':['fermi_alpha','fermi_b', 'social_factor',
-#     'opinion_max_diff', 'happiness_threshold'],
+#     'names':['fermi_alpha','fermi_beta', 'connection_influence',
+#     'opinion_threshold', 'happiness_threshold'],
 #     'bounds':[[0,4],[0,6],[0,1],[0,4],[0,1]],
 # }
-# model_reporters={"Network Modularity": lambda m:m.calculate_modularity(),
-#                  "Leibovici Entropy Index": lambda m: m.calculate_l_entropyindex(),
-#                  "Altieri Entropy Index": lambda m: m.calculate_a_entropyindex()}
+# model_reporters={"Network Modularity": lambda m:m.calc_modularity(),
+#                  "Leibovici Entropy Index": lambda m: m.calc_l_entropy(),
+#                  "Altieri Entropy Index": lambda m: m.calc_a_entropy()}
 
 # param_values_all = saltelli.sample(problem, distinct_samples, calc_second_order=False)
 
@@ -65,14 +65,14 @@
 
 # 	variable_parameters = [
 # 		{"fermi_alpha":param_values[i][0],
-# 		"fermi_b":param_values[i][1],
-# 		"social_factor":param_values[i][2],
-# 		"opinion_max_diff":param_values[i][3],
+# 		"fermi_beta":param_values[i][1],
+# 		"connection_influence":param_values[i][2],
+# 		"opinion_threshold":param_values[i][3],
 # 		"happiness_threshold":param_values[i][4]}
 # 		for i in range(len(param_values))
 # 	]
 
-# 	batch = BatchRunnerMP(CityModel,
+# 	batch = BatchRunnerMP(PolarizationModel,
 # 						iterations=replicates,
 # 						variable_parameters=variable_parameters,
 # 						max_steps=max_steps,
@@ -95,7 +95,7 @@ from SALib.sample import saltelli
 import numpy as np
 
 from polarization.mesa_fix.batchrunner import BatchRunnerMP
-from polarization.core.model import CityModel
+from polarization.core.model import PolarizationModel
 
 ###### --- FILL IN THESE VALUES --- #######
 
@@ -113,13 +113,13 @@ distinct_samples = 128
 # We define our variables and bounds
 problem = {
     'num_vars': 5,
-    'names': ['fermi_alpha', 'fermi_b', 'social_factor', 'opinion_max_diff', 'happiness_threshold'],
+    'names': ['fermi_alpha', 'fermi_beta', 'connection_influence', 'opinion_threshold', 'happiness_threshold'],
     'bounds': [[0, 4], [0, 6], [0, 1], [0, 4], [0, 1]],
 }
 model_reporters = {
-    "Network Modularity": lambda m: m.calculate_modularity(),
-    "Leibovici Entropy Index": lambda m: m.calculate_l_entropyindex(),
-    "Altieri Entropy Index": lambda m: m.calculate_a_entropyindex()
+    "Network Modularity": lambda m: m.calc_modularity(),
+    "Leibovici Entropy Index": lambda m: m.calc_l_entropy(),
+    "Altieri Entropy Index": lambda m: m.calc_a_entropy()
 }
 
 param_values_all = saltelli.sample(problem, distinct_samples, calc_second_order=False)
@@ -150,14 +150,14 @@ for interval in intervals:
 
     variable_parameters = [
         {"fermi_alpha": param_values[i][0],
-         "fermi_b": param_values[i][1],
-         "social_factor": param_values[i][2],
-         "opinion_max_diff": param_values[i][3],
+         "fermi_beta": param_values[i][1],
+         "connection_influence": param_values[i][2],
+         "opinion_threshold": param_values[i][3],
          "happiness_threshold": param_values[i][4]}
         for i in range(len(param_values))
     ]
 
-    batch = BatchRunnerMP(CityModel,
+    batch = BatchRunnerMP(PolarizationModel,
                           iterations=replicates,
                           variable_parameters=variable_parameters,
                           max_steps=max_steps,

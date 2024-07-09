@@ -10,7 +10,7 @@ import pandas as pd
 from mesa.batchrunner import BatchRunner, BatchRunnerMP
 from IPython.display import clear_output
 
-from polarization.core.model import CityModel
+from polarization.core.model import PolarizationModel
 
 # param_Nina      = param_values[0:160]
 # param_Maurits   = param_values[160:320]
@@ -32,14 +32,14 @@ distinct_samples = 128
 
 problem = {
     'num_vars':6,
-    'names':['fermi_alpha','fermi_b', 'social_factor',
-    'connections_per_step','opinion_max_diff', 'happiness_threshold'],
+    'names':['fermi_alpha','fermi_beta', 'connection_influence',
+    'target_connections','opinion_threshold', 'happiness_threshold'],
     'bounds':[[2,10],[0,10],[0,1],[1,5],[1,10],[0,1]],
 }
 
-model_reporters={"Network Modularity": lambda m:m.calculate_modularity(),
-                 "Leibovici Entropy Index": lambda m: m.calculate_l_entropyindex(),
-                 "Altieri Entropy Index": lambda m: m.calculate_a_entropyindex()}
+model_reporters={"Network Modularity": lambda m:m.calc_modularity(),
+                 "Leibovici Entropy Index": lambda m: m.calc_l_entropy(),
+                 "Altieri Entropy Index": lambda m: m.calc_a_entropy()}
 
 param_values_all = saltelli.sample(problem, distinct_samples, calc_second_order=False)
 
@@ -87,13 +87,13 @@ for interval in intervals:
         continue
 
 
-    batch = BatchRunner(CityModel,
+    batch = BatchRunner(PolarizationModel,
                         max_steps=max_steps,
                         variable_parameters={name:[] for name in problem['names']},
                         model_reporters=model_reporters)
 
     data = pd.DataFrame(index=range(replicates*len(param_values)),
-                                    columns=['fermi_alpha','fermi_b', 'social_factor','connections_perstep','opinion_max_diff', 'happiness_threshold'])
+                                    columns=['fermi_alpha','fermi_beta', 'connection_influence','connections_perstep','opinion_threshold', 'happiness_threshold'])
 
     #these are the outputs that we are measureing
     data['Run'],data["Replicates"],data['Network Modularity'],data["Leibovici Entropy Index"], data["Altieri Entropy Index"] = None, None, None, None, None

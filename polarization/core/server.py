@@ -5,7 +5,8 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 
-from polarization.core.model import CityModel, Resident
+from polarization.core.model import PolarizationModel, PolarizationAgent
+
 
 def agent_portrayal(agent):
     if agent == None:
@@ -15,7 +16,7 @@ def agent_portrayal(agent):
                  "Filled": "true",
                  "r": 0.5,
                  "Layer":0}
-    if type(agent) is Resident:
+    if type(agent) is PolarizationAgent:
         if 0 <= agent.opinion < 1:
             portrayal["Color"] = "#1c1cff"
         elif 1 <= agent.opinion < 2:
@@ -40,7 +41,7 @@ def agent_portrayal(agent):
     return portrayal
 
 
-grid= CanvasGrid(agent_portrayal,20,20,500,500)
+grid = CanvasGrid(agent_portrayal, 20, 20, 500, 500)
 
 
 # chart1 = ChartModule([{"Label":"graph_modularity",
@@ -52,23 +53,23 @@ grid= CanvasGrid(agent_portrayal,20,20,500,500)
 #                      "Color":"Blue"}],
 #                      data_collector_name='datacollector')
 
-# chart3 = ChartModule([{"Label":"movers_per_step",
+# chart3 = ChartModule([{"Label":"agents_moved",
 #                      "Color":"Black"}],
 #                      data_collector_name='datacollector')
 
-model_params=dict(sidelength=20,
-                density=0.9,
-                m_barabasi=2,
-                fermi_alpha=4,
-                fermi_b=1,
-                social_factor=0.8,
-                connections_per_step=5,
-                opinion_max_diff=2,
-                happiness_threshold=0.8)
+model_params = dict(width=20,
+                    density=0.9,
+                    network_m=2,
+                    fermi_alpha=4,
+                    fermi_beta=1,
+                    connection_influence=0.8,
+                    target_connections=5,
+                    opinion_threshold=2,
+                    happiness_threshold=0.8)
 
-server = ModularServer(CityModel,
-                        [grid],
-                        "City Model",
-                        model_params)
-server.port=8521
+server = ModularServer(PolarizationModel,
+                       [grid],
+                       "Polarization Model",
+                       model_params)
+server.port = 8521
 server.launch()

@@ -7,7 +7,7 @@ def time_model_step(model):
     """Times the next step of a model
 
     Args:
-        model (CityModel): model to time
+        model (PolarizationModel): model to time
 
     Returns:
         float: process time
@@ -24,7 +24,7 @@ def benchmark(model, step_count):
 
 
     Args:
-        model (CityModel): model to benchmark
+        model (PolarizationModel): model to benchmark
         step_count (int): number of steps
 
     Returns:

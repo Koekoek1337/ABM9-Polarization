@@ -197,7 +197,7 @@ class FixedBatchRunner:
     def run_model(self, model):
         """Run a model object to completion, or until reaching max steps.
 
-        If your model runs in a non-standard way, this is the method to modify
+        If your model runs in a non-standard way, this is the action to modify
         in your subclass.
 
         """
