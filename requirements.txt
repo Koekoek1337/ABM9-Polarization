@@ -1,0 +1,28 @@
+###### Requirements with version specifiers ######
+
+Axelrod==4.10.0
+matplotlib==3.9.0
+Mesa==0.8.8
+networkx==3.2.1
+numba==0.60.0
+scipy==1.13.1
+pydot==2.0.0
+numpy==2.0.0
+pandas==2.2.2
+seaborn==0.13.2
+SALib==1.3.3
+statsmodels==0.14.2
+tqdm==4.66.4
+spatialentropy==0.1.0
+simpy==4.1.1
+pytest==8.2.2
+multiprocess==0.70.16
+pandas==2.2.2
+bokeh==3.4.1
+
+
+# Ensure Graphviz is installed by following these steps:
+# 1. Download Graphviz from [this link](https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/11.0.0/windows_10_cmake_Release_graphviz-install-11.0.0-win64.exe).
+# 2. Install Graphviz to the default directory (usually C:\Programs).
+# 3. Navigate to the 'bin' folder within the installation directory, copy its path, and add it to your system's environment variables.
+# 4. Restart your computer to apply the changes.

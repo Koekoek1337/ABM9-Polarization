@@ -1,0 +1,1 @@
+['fermi_alpha', 'fermi_b', 'social_factor', 'connections_per_step', 'opinion_max_diff', 'happiness_threshold']
