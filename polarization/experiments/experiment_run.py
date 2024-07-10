@@ -130,6 +130,6 @@ def plot_experiment(agent_dfs, model_dfs, stepcount, experiment):
 
     plt.tight_layout()
     
-    filename = 'without0.8'
+    filename = 'without0.5_50'
     plt.savefig(f"figures/{filename}.png")
 

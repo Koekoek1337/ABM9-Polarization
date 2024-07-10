@@ -191,3 +191,5 @@ plot_index(si_resident_entropy , problem["names"],      i="1",ax=ax[1][0],title=
 plot_index(si_resident_modularity , problem["names"],   i="T",ax=ax[0][1],title= "Total S\nModularity")
 plot_index(si_resident_entropy , problem["names"],      i="T",ax=ax[1][1],title= "Entropy")
 plt.savefig("figures/GSA5.png")
+# plot_index(si_resident_modularity , problem["names"],   i="2",ax=ax[0][1],title= "2nd Order Sensitivity\nnModularity")
+# plot_index(si_resident_entropy , problem["names"],      i="2",ax=ax[1][1],title= "Entropy")

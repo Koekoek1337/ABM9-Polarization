@@ -132,14 +132,16 @@ class PolarizationAgent(Agent):
         unconnected_agents = [agent for agent in self.model.schedule.agents if agent.unique_id != self.unique_id and
                               agent.unique_id not in self.connections_ids]
         potential_connections = [agent for agent in unconnected_agents if abs(agent.opinion - self.opinion) >=
-                                 self.model.opinion_max_diff*0.5]
+                                 self.model.opinion_max_diff*0.7]
 
         if potential_connections:
             potential = random.choice(potential_connections)
             self.evaluate_connection(potential_agent=potential, action="ADD")
 
+
     def step(self):
         self.form_connection()
+        # self.connect_different_opinions()
         self.break_connection()
         self.relocate()
         self.adapt_opinion()
