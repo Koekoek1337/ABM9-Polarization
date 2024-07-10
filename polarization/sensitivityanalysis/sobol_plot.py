@@ -16,7 +16,7 @@ problem = {
 }
 #set up data, loading from all csv files
 DATA_DIR = "./data/sobol/"
-datafiles = [dir for dir in os.listdir(DATA_DIR) if dir.startswith("combined_results_maurits2")]
+datafiles = [dir for dir in os.listdir(DATA_DIR) if dir.startswith("combined_results")]
 
 dataframes = []
 for dir in datafiles:

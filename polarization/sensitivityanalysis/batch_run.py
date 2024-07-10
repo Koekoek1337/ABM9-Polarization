@@ -96,16 +96,16 @@ import numpy as np
 
 from polarization.mesa_fix.batchrunner import BatchRunnerMP
 from polarization.core.model import CityModel
-
+from mesa.batchrunner import FixedBatchRunner
 ###### --- FILL IN THESE VALUES --- #######
 
-WHO_IS_RUNNING = "maurits"
+WHO_IS_RUNNING = ""
 MY_PARAM_SET = (0, 19)
 ps = MY_PARAM_SET
 
 ###### --- UNTIL HERE --- #######
 
-replicates = 1
+replicates = 10
 max_steps = 20
 distinct_samples = 128
 
@@ -157,9 +157,9 @@ for interval in intervals:
         for i in range(len(param_values))
     ]
 
-    batch = BatchRunnerMP(CityModel,
+    batch = FixedBatchRunner(CityModel,
                           iterations=replicates,
-                          variable_parameters=variable_parameters,
+                          parameters_list=variable_parameters,
                           max_steps=max_steps,
                           model_reporters=model_reporters,
                           display_progress=True)
@@ -179,5 +179,5 @@ import pandas as pd
 
 all_files = [os.path.join(GENERAL_DIR, f) for f in os.listdir(GENERAL_DIR) if f.endswith('.csv')]
 combined_df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index=True)
-combined_df.to_csv(f"{GENERAL_DIR}combined_results_{WHO_IS_RUNNING}2.csv", index=False)
-print(f"\n All results have been combined into {GENERAL_DIR}combined_results_{WHO_IS_RUNNING}.csv \n")
+combined_df.to_csv(f"{GENERAL_DIR}combined_results3.csv", index=False)
+print(f"\n All results have been combined into {GENERAL_DIR}combined_results.csv \n")
