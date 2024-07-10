@@ -1,7 +1,7 @@
 """This file generates the results of a set of Experiments with the model
     """
 # order of the parameters:
-# width, density, network_m, fermi_alpha, fermi_b, connection_influence, target_connections, opinion_threshold, conformity
+# width, density, network_m, fermi_alpha, fermi_b, social_factor, connections, opinion_threshold, conformity
 
 
 experiments = [
@@ -15,7 +15,7 @@ experiments = [
     # {"name":"default_extra_large_dens", "values":[40, 0.95,2, 4, 1, 0.8, 5, 2, 0.8]},
     # {"name":"tolerance_high",           "values":[20, 0.9, 2, 4, 1, 0.8, 5, 4, 0.8]},
     # {"name":"tolerance_low",            "values":[20, 0.9, 2, 4, 1, 0.8, 5, 1, 0.8]},
-    {"name":"alpha_low",                "values":[20, 0.8, 2, 1, 1, 0.3, 5, 1, 0.5]},
+    {"name":"alpha_low",                "values":[20, 0.8, 2, 1, 1, 0.3, 5, 2, 0.5]},
     # {"name":"alpha_high",               "values":[20, 0.9, 2, 6, 1, 0.8, 5, 2, 0.8]},
     # {"name":"beta_high",                "values":[20, 0.9, 2, 4, 3, 0.8, 5, 2, 0.8]},
 ]
