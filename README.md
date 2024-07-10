@@ -10,8 +10,7 @@
 This project focuses on understanding the dynamics of opinion polarization where individuals are influenced by their social and spatial neighbors. Our primary goals were to observe polarization in a society with dual opinions and to test strategies to mitigate polarization.
 
 
-![Opinion Polarization with cross connection (conformity=0.8)](figures/without0.8_0.5_20.png)(https://github.com/Koekoek1337/ABM9-Polarization/blob/nm_Kaushik/figures/without0.8_0.5_20.png)
-
+![Opinion Polarization with cross connection (conformity=0.8)](figures/with0.8_50steps.png)
 
 ## Installation Instructions
 To install necessary dependencies, run the following command using pip:
