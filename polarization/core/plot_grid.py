@@ -7,19 +7,20 @@ import matplotlib.cm as cm
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
 
-def grid_plot(agent_df, plot_step, sidelength, ax=None):
+
+def grid_plot(agent_df, plot_step, width, ax=None):
     """Plotting the agents on a grid, coloured by their political opinion
 
     Args:
         agent_df ([type]): df containing agents data from datacollector 
         plot_step ([type]): 
-        sidelength (int): side length used in model
+        width (int): side length used in model
     """
     agentdf = pd.DataFrame(agent_df.loc[[plot_step], ["position", "opinion"]])\
         .sort_values("position")\
         .droplevel(0)
 
-    op_grid = np.empty((sidelength, sidelength))
+    op_grid = np.empty((width, width))
 
     #since density of agents is not 1, there will be some empty positions
     op_grid[:] = np.nan

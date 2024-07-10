@@ -8,7 +8,7 @@
 # sns.set_theme()
 # sns.set_color_codes()
 
-# from polarization.core.model import CityModel
+# from polarization.core.model import PolarizationModel
 # from polarization.core.plot_graph import plot_single_graph
 # from polarization.core.plot_grid import grid_plot
 
@@ -59,7 +59,7 @@
 #     )
 #     ax.legend()
 
-# PARAMS_NAMES = [ "sidelength", "density","m_barabasi", "fermi_alpha", "fermi_b", "social_factor", "connections_per_step","opinion_max_diff", "happiness_threshold" ]
+# PARAMS_NAMES = [ "width", "density","network_m", "fermi_alpha", "fermi_beta", "connection_influence", "target_connections","opinion_threshold", "happiness_threshold" ]
 
 
 # def run_experiment(iterations, stepcount, experiment):
@@ -76,7 +76,7 @@
 #     model_dfs = []
 #     agent_dfs = []
 #     for i in range(iterations):
-#         model = CityModel(*(experiment["values"]))
+#         model = PolarizationModel(*(experiment["values"]))
 #         model.run_model(step_count=stepcount, desc=f'step {i}', collect_initial=True)
 
 #         model_dataframe = model.datacollector.get_model_vars_dataframe()
@@ -165,7 +165,7 @@ import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 import seaborn as sns
-from polarization.core.model import CityModel
+from polarization.core.model import PolarizationModel
 from polarization.core.plot_graph import plot_single_graph
 from polarization.core.plot_grid import grid_plot
 
@@ -202,7 +202,7 @@ def plot_errorHue(mean_list, std_list, label, start=0, sample_data=None, sample_
     )
     ax.legend()
 
-PARAMS_NAMES = ["sidelength", "density", "m_barabasi", "fermi_alpha", "fermi_b", "social_factor", "connections_per_step", "opinion_max_diff", "happiness_threshold"]
+PARAMS_NAMES = ["width", "density", "network_m", "fermi_alpha", "fermi_beta", "connection_influence", "target_connections", "opinion_threshold", "happiness_threshold"]
 
 def run_experiment(iterations, stepcount, experiment):
     """ Running experiment and collecting data
@@ -218,7 +218,7 @@ def run_experiment(iterations, stepcount, experiment):
     model_dfs = []
     agent_dfs = []
     for i in range(iterations):
-        model = CityModel(*(experiment["values"]))
+        model = PolarizationModel(*(experiment["values"]))
         model.run_model(step_count=stepcount, desc=f'step {i}', collect_initial=True)
 
         model_dataframe = model.datacollector.get_model_vars_dataframe()
