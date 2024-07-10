@@ -13,7 +13,23 @@ from spatialentropy import leibovici_entropy, altieri_entropy
 
 random.seed(711)
 
+
 class PolarizationAgent(Agent):
+    """
+    An agent in the Polarization model
+
+    Attributes:
+        unique_id (int): The unique identifier of the agent.
+        model (PolarizationModel): The model the agent belongs to.
+        pos (tuple): The position of the agent on the grid.
+        is_ideologue (bool): Whether the agent is an ideologue with a fixed opinion.
+        ideologue_opinion (float): The fixed opinion of the agent if it is an ideologue.
+        opinion (float): The current opinion of the agent.
+        conformity (float): The conformity level of the agent.
+        weight_own (float): The weight given to the agent's own opinion when updating.
+        weight_connections (float): The weight given to the opinions of the agent's social connections when updating.
+        weight_neighbors (float): The weight given to the opinions of the agent's spatial neighbors when updating.
+    """
     def __init__(self, unique_id, model, pos, is_ideologue=False, ideologue_opinion=None):
         super().__init__(unique_id, model)
         self.pos = pos
@@ -31,27 +47,33 @@ class PolarizationAgent(Agent):
 
     @property
     def connections_ids(self):
+        """Get the unique IDs of the agent's social connections."""
         return [connection_id for connection_id in self.model.graph[self.unique_id]]
 
     @property
     def connections(self):
+        """Get the agent objects of the agent's social connections."""
         return [connection for connection in self.model.schedule.agents if connection.unique_id in self.connections_ids]
 
     @property
     def unconnected_ids(self):
+        """Get the unique IDs of the agents not socially connected to the agent."""
         return [unconnected_id for unconnected_id in self.model.graph.nodes if (unconnected_id not in
                                                                                 self.connections_ids + [self.unique_id])]
 
     @property
     def unconnected(self):
+        """Get the agent objects of the agents not socially connected to the agent."""
         return [unconnected for unconnected in self.model.schedule.agents if unconnected.unique_id not in
                 self.connections_ids]
 
     @property
     def neighbours(self):
+        """Get the agent objects of the agent's spacial neighbors."""
         return self.model.grid.get_neighbors(self.pos, moore=True, include_center=False, radius=1)
 
     def calc_influence(self):
+        """Calculate the influence from the agent's social connections and spatial neighbors."""
         neighbor_influence = 0
         num_neighbors = 0
         social_factor = 0
@@ -72,6 +94,7 @@ class PolarizationAgent(Agent):
         return avg_connection_opinion, avg_neighbor_opinion
 
     def adapt_opinion(self):
+        """Update the agent's opinion based on the influence from social connections and spatial neighbors."""
         if not self.is_ideologue:
             connection_infl, neighbor_infl = self.calc_influence()
             updated_opinion = self.opinion
@@ -87,6 +110,7 @@ class PolarizationAgent(Agent):
             self.opinion = updated_opinion
 
     def form_connection(self):
+        """Form new social connections with other agents."""
         if len(self.unconnected_ids) < self.model.connections_per_step:
             num_potential_connections = len(self.unconnected_ids)
         else:
@@ -99,6 +123,7 @@ class PolarizationAgent(Agent):
             self.evaluate_connection(potential_agent=potential_agent, action="ADD")
 
     def break_connection(self):
+        """Break existing social connections with other agents."""
         num_current_connections = len(self.connections_ids)
         if num_current_connections < self.model.connections_per_step:
             num_potential_disconnections = 0
@@ -113,6 +138,7 @@ class PolarizationAgent(Agent):
             self.evaluate_connection(potential_agent, action="REMOVE")
 
     def evaluate_connection(self, potential_agent, action):
+        """Evaluate whether to form or break a social connection with another agent."""
         probability = 0.50
 
         if action == "ADD":
@@ -123,12 +149,14 @@ class PolarizationAgent(Agent):
                 self.model.graph.remove_edge(self.unique_id, potential_agent.unique_id)
 
     def relocate(self):
+        """Relocate the agent to a new position if the opinion difference with neighbors is above a threshold."""
         _, avg_neighbor_opinion = self.calc_influence()
         if abs(self.opinion - avg_neighbor_opinion) > self.model.opinion_max_diff:
             self.model.grid.move_to_empty(self)
             self.model.agents_moved += 1
 
     def connect_different_opinions(self):
+        """To connect agents with different opinions"""
         unconnected_agents = [agent for agent in self.model.schedule.agents if agent.unique_id != self.unique_id and
                               agent.unique_id not in self.connections_ids]
         potential_connections = [agent for agent in unconnected_agents if abs(agent.opinion - self.opinion) >=
@@ -146,6 +174,30 @@ class PolarizationAgent(Agent):
 
 
 class PolarizationModel(Model):
+    """
+    The Polarization Model.
+
+    Attributes:
+        width (int): The width of the grid.
+        density (float): The initial density of agents on the grid.
+        network_m (int): The number of edges to add for each new node in the Barabasi-Albert graph.
+        fermi_alpha (float): The parameter that describes the steepness of the Fermi-Dirac distribution curve.
+                             It determines how the probability of forming/breaking a connection changes based on
+                             the opinion difference between agents.
+        fermi_b (float): The parameter that defines the opinion difference threshold in the Fermi-Dirac
+                            distribution. It determines the opinion difference at which the probability of
+                            forming/breaking a connection is 0.5.
+        social_factor (float): The influence of social connections on opinion formation.
+        connections_per_step (int): The target number of social connections for each agent.
+        opinion_max_diff (float): The threshold for opinion difference when forming/breaking social connections.
+        schedule (RandomActivation): The scheduler for activating agents.
+        agents_moved (int): The number of agents that moved in the current step.
+        num_agents (int): The total number of agents in the model.
+        grid (SingleGrid): The grid environment for the agents.
+        graph (nx.Graph): The social network graph of the agents.
+        datacollector (DataCollector): The data collector for recording model and agent data.
+        running (bool): Whether the model is currently running.
+    """
     def __init__(self, width=20, density=0.8, network_m=2, fermi_alpha=5, fermi_b=3, social_factor=0.8,
                  connections_per_step=5, opinion_max_diff=0.2, conformity=0.8):
         self.width = width
@@ -183,19 +235,23 @@ class PolarizationModel(Model):
         self.running = True
 
     def calc_modularity(self):
+        """Calculate the modularity of the social network graph."""
         max_mod_communities = greedy_modularity_communities(self.graph)
         mod = modularity(self.graph, max_mod_communities)
         return mod
 
     def calc_clustering(self):
+        """Calculate the clustering coefficient of the social network graph."""
         cluster_coefficient = average_clustering(self.graph)
         return cluster_coefficient
 
     def get_graph_data(self):
+        """Get the social network graph data as a dictionary."""
         graph_dict = nx.convert.to_dict_of_dicts(self.graph)
         return graph_dict
 
     def calc_l_entropy(self):
+        """Calculate the Leibovici entropy index of teh agent opinions."""
         agent_info_list = [[agent.pos, agent.opinion] for agent in self.schedule.agents]
         points = []
         types = []
@@ -217,6 +273,7 @@ class PolarizationModel(Model):
         return e_entropyind
 
     def calc_a_entropy(self):
+        """Calculate the Altieri entropy index of the agent opinions."""
         agent_info_list = [[agent.pos, agent.opinion] for agent in self.schedule.agents]
         points = []
         types = []
@@ -238,6 +295,7 @@ class PolarizationModel(Model):
         return a_entropyind
 
     def setup_agents(self):
+        """Set up the agents on the grid."""
         num_agents = int(self.width * self.width * self.density)
         fixed_opinion_counter = 0
 

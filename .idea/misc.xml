@@ -4,4 +4,7 @@
     <option name="sdkName" value="Python 3.9 (abm_env)" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9 (abm_env)" project-jdk-type="Python SDK" />
+  <component name="PyCharmDSProjectLayout">
+    <option name="id" value="JupyterRightHiddenStructureLayout" />
+  </component>
 </project>
