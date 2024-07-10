@@ -14,6 +14,21 @@ from spatialentropy import leibovici_entropy, altieri_entropy
 random.seed(711)
 
 class PolarizationAgent(Agent):
+    """
+    An agent in the Polarization model
+
+    Attributes:
+        unique_id (int): The unique identifier of the agent.
+        model (PolarizationModel): The model the agent belongs to.
+        pos (tuple): The position of the agent on the grid.
+        is_ideologue (bool): Whether the agent is an ideologue with a fixed opinion.
+        ideologue_opinion (float): The fixed opinion of the agent if it is an ideologue.
+        opinion (float): The current opinion of the agent.
+        conformity (float): The conformity level of the agent.
+        weight_own (float): The weight given to the agent's own opinion when updating.
+        weight_connections (float): The weight given to the opinions of the agent's social connections when updating.
+        weight_neighbors (float): The weight given to the opinions of the agent's spatial neighbors when updating.
+    """
     def __init__(self, unique_id, model, pos, is_ideologue=False, ideologue_opinion=None):
         super().__init__(unique_id, model)
         self.pos = pos
@@ -148,6 +163,30 @@ class PolarizationAgent(Agent):
 
 
 class PolarizationModel(Model):
+    """
+    The Polarization Model.
+
+    Attributes:
+        width (int): The width of the grid.
+        density (float): The initial density of agents on the grid.
+        network_m (int): The number of edges to add for each new node in the Barabasi-Albert graph.
+        fermi_alpha (float): The parameter that describes the steepness of the Fermi-Dirac distribution curve.
+                             It determines how the probability of forming/breaking a connection changes based on
+                             the opinion difference between agents.
+        fermi_b (float): The parameter that defines the opinion difference threshold in the Fermi-Dirac
+                            distribution. It determines the opinion difference at which the probability of
+                            forming/breaking a connection is 0.5.
+        social_factor (float): The influence of social connections on opinion formation.
+        connections_per_step (int): The target number of social connections for each agent.
+        opinion_max_diff (float): The threshold for opinion difference when forming/breaking social connections.
+        schedule (RandomActivation): The scheduler for activating agents.
+        agents_moved (int): The number of agents that moved in the current step.
+        num_agents (int): The total number of agents in the model.
+        grid (SingleGrid): The grid environment for the agents.
+        graph (nx.Graph): The social network graph of the agents.
+        datacollector (DataCollector): The data collector for recording model and agent data.
+        running (bool): Whether the model is currently running.
+    """
     def __init__(self, width=20, density=0.8, network_m=2, fermi_alpha=5, fermi_b=3, social_factor=0.8,
                  connections_per_step=5, opinion_max_diff=0.2, conformity=0.8):
         self.width = width
