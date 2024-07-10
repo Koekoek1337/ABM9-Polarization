@@ -5,11 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6435c467-9e7d-4c86-9229-dfe76d5067dc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ABM9-Polarization.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ABM9-Polarization.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/polarization/core/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/polarization/core/model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/polarization/sensitivityanalysis/ofatsa.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/polarization/sensitivityanalysis/ofatsa.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
