@@ -40,7 +40,7 @@ def plot_errorHue(mean_list, std_list, label, start=0, sample_data=None, sample_
     )
     ax.legend()
 
-PARAMS_NAMES = ["width", "density", "network_m", "fermi_alpha", "fermi_b", "social_factor", "opinion_max_diff", "happiness_threshold"]
+PARAMS_NAMES = ["width", "density", "network_m", "fermi_alpha", "fermi_b", "social_factor", "opinion_max_diff", "conformity"]
 
 def run_experiment(iterations, stepcount, experiment):
     """ Running experiment and collecting data

@@ -14,7 +14,7 @@ ps = MY_PARAM_SET
 
 ###### --- UNTIL HERE --- #######
 
-replicates = 5
+replicates = 1
 max_steps = 20
 distinct_samples = 128
 
@@ -22,8 +22,8 @@ distinct_samples = 128
 # We define our variables and bounds
 problem = {
     'num_vars': 5,
-    'names': ['fermi_alpha', 'fermi_b', 'social_factor', 'opinion_max_diff', 'happiness_threshold'],
-    'bounds': [[0, 4], [0, 6], [0, 1], [0, 4], [0, 1]],
+    'names': ['fermi_alpha', 'fermi_b', 'social_factor', 'opinion_max_diff', 'conformity'],
+    'bounds': [[0, 4], [0, 6], [0, 1], [0, 4], [0.2, 0.8]],
 }
 model_reporters = {
     "Network Modularity": lambda m: m.calc_modularity(),
@@ -62,7 +62,7 @@ for interval in intervals:
          "fermi_b": param_values[i][1],
          "social_factor": param_values[i][2],
          "opinion_max_diff": param_values[i][3],
-         "happiness_threshold": param_values[i][4]}
+         "conformity": param_values[i][4]}
         for i in range(len(param_values))
     ]
 

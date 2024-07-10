@@ -65,7 +65,7 @@ model_params = dict(width=20,
                     social_factor =0.8,
                     connections_per_step=5,
                     opinion_max_diff =2,
-                    happiness_threshold=0.8)
+                    conformity=0.8)
 
 server = ModularServer(PolarizationModel,
                        [grid],
