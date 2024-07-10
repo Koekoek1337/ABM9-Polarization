@@ -1,0 +1,37 @@
+The Fermi Equation
+
+The Fermi equation for the probability pijpij​ of forming or breaking a connection between agent ii and agent jj is typically formulated as:
+
+pij=11+exp⁡(α⋅(∣oi−oj∣−β))pij​=1+exp(α⋅(∣oi​−oj​∣−β))1​
+
+Where:
+
+    oioi​ and ojoj​ are the opinions of agent ii and agent jj, respectively.
+    αα is a parameter that controls the sensitivity of the probability to the difference in opinions.
+    ββ is a threshold parameter that shifts the curve along the x-axis, determining the base level of tolerance for opinion differences.
+
+How αα and ββ Affect the Probability
+αα (Sensitivity Parameter)
+
+    High αα Value:
+        When αα is large, the function becomes steeper. This means that even small differences in opinions ∣oi−oj∣∣oi​−oj​∣ can result in a significant change in the probability pijpij​.
+        High αα values indicate low tolerance for opinion differences. Small differences in opinion lead to a rapid decrease in the probability of forming a connection.
+
+    Low αα Value:
+        When αα is small, the function is more gradual. This means that larger differences in opinions are needed to significantly affect the probability pijpij​.
+        Low αα values indicate high tolerance for opinion differences. The probability of forming a connection decreases more slowly as the opinion difference increases.
+
+ββ (Threshold Parameter)
+
+    High ββ Value:
+        A high ββ shifts the curve to the right, meaning that the agents are more tolerant of opinion differences before the probability pijpij​ starts to decrease significantly.
+        With a high ββ, larger opinion differences are tolerated, and the probability of forming a connection remains relatively high even for agents with different opinions.
+
+    Low ββ Value:
+        A low ββ shifts the curve to the left, meaning that even small opinion differences result in a decrease in the probability pijpij​.
+        With a low ββ, smaller opinion differences are tolerated, and the probability of forming a connection decreases more rapidly as the opinion difference increases.
+
+Interpretation in Social Contexts
+
+    αα affects how sharply opinion differences influence social connections. Higher sensitivity means that individuals are less likely to connect with those who have different opinions, leading to more homogeneous social groups.
+    ββ sets the base level of tolerance. A higher threshold means individuals are generally more tolerant of differences, promoting more diverse social connections.
