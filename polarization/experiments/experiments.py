@@ -22,7 +22,7 @@ experiments = [
 
 from polarization.experiments.experiment_run import run_experiment, plot_experiment
 stepcount = 20
-iterations = 5
+iterations = 30
 for experiment in experiments:
     agent_dfs, model_dfs = run_experiment(iterations, stepcount, experiment)
     _ = plot_experiment(agent_dfs, model_dfs, stepcount, experiment)

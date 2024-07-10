@@ -22,7 +22,6 @@ class Resident(Agent):
             self.opinion = fixed_opinion_value #random.choice([0, 1])  # Fixed opinion of 0 or 1
         else:
             self.opinion = self.random.uniform(0, 10)
-        #self.opinion = self.random.uniform(0, 1)
         self.conformity = 0.8 #self.random.uniform(0.4, 0.8)
         self.weight_own = 1 - self.conformity
         self.weight_socials = self.model.social_factor * self.conformity

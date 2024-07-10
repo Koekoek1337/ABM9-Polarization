@@ -89,9 +89,9 @@ def plot_index(s, params, i, ax=None, title=''):
     plt.tight_layout()
 
 # Adjust the plotting calls to remove 'happiness_threshold'
-fig, ax = plt.subplots(2, 2, figsize=(9, 5), sharey=True, sharex=True)
+fig, ax = plt.subplots(2, 2, figsize=(10, 8), sharey=True, sharex=True)
 plot_index(si_resident_modularity, problem["names"], i="1", ax=ax[0][0], title="1st Order Sensitivity\nModularity")
 plot_index(si_resident_entropy, problem["names"], i="1", ax=ax[1][0], title="1st Order Sensitivity\nEntropy")
 plot_index(si_resident_modularity, problem["names"], i="T", ax=ax[0][1], title="Total Order Sensitivity\nModularity")
 plot_index(si_resident_entropy, problem["names"], i="T", ax=ax[1][1], title="Total Order Sensitivity\nEntropy")
-plt.savefig("figures/GSA4.svg")
+plt.savefig("figures/GSA4.png")

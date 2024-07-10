@@ -285,17 +285,13 @@ def plot_experiment(agent_dfs, model_dfs, stepcount, experiment):
 
     ax[1][2].hist(sample[0].loc[stepcount, ["opinion"]], color='r', density=True)
     
-    ax[0][1].set(xlabel="step", title="Modularity")
+    ax[0][1].set(xlabel="step", title="Modularity ")
     ax[1][1].set(xlabel="step", title="Altieri Entropy")
-    ax[0][2].set(xlabel="step", title="Movers")
+    ax[0][2].set(xlabel="step", title="Movers Step")
     ax[1][2].set(xlabel="Opinion", title="Opinion Distribution")
 
     plt.tight_layout()
     
-    filename = 'without0.2_0.5_20'
-    plt.savefig(f"figures/{filename}.svg")
+    filename = 'without0.8'
+    plt.savefig(f"figures/{filename}.png")
 
-# Example usage:
-# experiment = {"values": [value1, value2, value3, ...]}
-# agent_dfs, model_dfs = run_experiment(10, 100, experiment)
-# plot_experiment(agent_dfs, model_dfs, 100, experiment)
