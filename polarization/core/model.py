@@ -40,8 +40,8 @@ class PolarizationAgent(Agent):
             self.opinion = self.random.uniform(0, 10)
         self.conformity = 0.8 #self.random.uniform(0.4, 0.8)
         self.weight_own = 1 - self.conformity
-        self.weight_connections = self.model.connection_influence * self.conformity
-        self.weight_neighbors = (1 - self.model.connection_influence) * self.conformity
+        self.weight_connections = self.model.social_factor * self.conformity
+        self.weight_neighbors = (1 - self.model.social_factor) * self.conformity
 
     @property
     def connections_ids(self):
@@ -74,17 +74,17 @@ class PolarizationAgent(Agent):
         """Calculate the influence from the agent's social connections and spatial neighbors."""
         neighbor_influence = 0
         num_neighbors = 0
-        connection_influence = 0
+        social_factor = 0
         num_connections = 0
 
         for connection in self.connections:
-            if abs(connection.opinion - self.opinion) < self.model.opinion_threshold:
-                connection_influence += connection.opinion
+            if abs(connection.opinion - self.opinion) < self.model.opinion_max_diff:
+                social_factor += connection.opinion
                 num_connections += 1
-        avg_connection_opinion = connection_influence / num_connections if num_connections != 0 else 0
+        avg_connection_opinion = social_factor / num_connections if num_connections != 0 else 0
 
         for neighbor in self.model.grid.get_neighbors(pos=self.pos, moore=True, include_center=False, radius=1):
-            if abs(neighbor.opinion - self.opinion) < self.model.opinion_threshold:
+            if abs(neighbor.opinion - self.opinion) < self.model.opinion_max_diff:
                 num_neighbors += 1
                 neighbor_influence += neighbor.opinion
         avg_neighbor_opinion = neighbor_influence / num_neighbors if num_neighbors != 0 else 0
@@ -120,10 +120,10 @@ class PolarizationAgent(Agent):
 
     def form_connection(self):
         """Form new social connections with other agents."""
-        if len(self.unconnected_ids) < self.model.target_connections:
+        if len(self.unconnected_ids) < self.model.connections_per_step:
             num_potential_connections = len(self.unconnected_ids)
         else:
-            num_potential_connections = self.model.target_connections
+            num_potential_connections = self.model.connections_per_step
 
         potential_ids = np.random.choice(self.unconnected_ids, size=num_potential_connections, replace=False)
         potential_agents = [connection for connection in self.model.schedule.agents if connection.unique_id in potential_ids]
@@ -134,11 +134,11 @@ class PolarizationAgent(Agent):
     def break_connection(self):
         """Break existing social connections with other agents."""
         num_current_connections = len(self.connections_ids)
-        if num_current_connections < self.model.target_connections:
+        if num_current_connections < self.model.connections_per_step:
             num_potential_disconnections = 0    #num_current_connections
         else:
             num_potential_disconnections = (num_current_connections -
-                                            self.model.target_connections) #self.model.target_connections
+                                            self.model.connections_per_step) #self.model.connections_per_step
 
         potential_ids = np.random.choice(self.connections_ids, size=num_potential_disconnections, replace=False)
         potential_agents = [connection for connection in self.model.schedule.agents if connection.unique_id in potential_ids]
@@ -148,7 +148,7 @@ class PolarizationAgent(Agent):
 
     def evaluate_connection(self, potential_agent, action):
         """Evaluate whether to form or break a social connection with another agent."""
-        # p_ij = 1 / (1 + np.exp(self.model.fermi_alpha * (abs(self.opinion - potential_agent.opinion) - self.model.fermi_beta)))
+        # p_ij = 1 / (1 + np.exp(self.model.fermi_alpha * (abs(self.opinion - potential_agent.opinion) - self.model.fermi_b)))
         # print(p_ij)
         
         probability = 0.50 # For now, hange to vary the probability of connection, higher => higher connections
@@ -163,11 +163,11 @@ class PolarizationAgent(Agent):
     def relocate(self):
         """Relocate the agent to a new position if the opinion difference with neighbors is above a threshold."""
         _, avg_neighbor_opinion = self.calc_influence()
-        if abs(self.opinion - avg_neighbor_opinion) > self.model.opinion_threshold:
+        if abs(self.opinion - avg_neighbor_opinion) > self.model.opinion_max_diff:
             self.model.grid.move_to_empty(self)
             self.model.agents_moved += 1
             
-        # happiness = 1 / (1 + np.exp(self.model.fermi_alpha * (abs(self.opinion - av_nbr_op) - self.model.fermi_beta)))
+        # happiness = 1 / (1 + np.exp(self.model.fermi_alpha * (abs(self.opinion - av_nbr_op) - self.model.fermi_b)))
 
         # if happiness < self.model.happiness_threshold:
         #     self.model.grid.move_to_empty(self)
@@ -179,7 +179,7 @@ class PolarizationAgent(Agent):
         unconnected_agents = [agent for agent in self.model.schedule.agents if agent.unique_id != self.unique_id and
                               agent.unique_id not in self.connections_ids]
         potential_connections = [agent for agent in unconnected_agents if abs(agent.opinion - self.opinion) >=
-                                 self.model.opinion_threshold*0.5] # To change this part to connect agents with differing opinions
+                                 self.model.opinion_max_diff*0.5] # To change this part to connect agents with differing opinions
 
         if potential_connections:
             potential = random.choice(potential_connections)
@@ -204,12 +204,12 @@ class PolarizationModel(Model):
         fermi_alpha (float): The parameter that describes the steepness of the Fermi-Dirac distribution curve.
                              It determines how the probability of forming/breaking a connection changes based on
                              the opinion difference between agents.
-        fermi_beta (float): The parameter that defines the opinion difference threshold in the Fermi-Dirac
+        fermi_b (float): The parameter that defines the opinion difference threshold in the Fermi-Dirac
                             distribution. It determines the opinion difference at which the probability of
                             forming/breaking a connection is 0.5.
-        connection_influence (float): The influence of social connections on opinion formation.
-        target_connections (int): The target number of social connections for each agent.
-        opinion_threshold (float): The threshold for opinion difference when forming/breaking social connections.
+        social_factor (float): The influence of social connections on opinion formation.
+        connections_per_step (int): The target number of social connections for each agent.
+        opinion_max_diff (float): The threshold for opinion difference when forming/breaking social connections.
         schedule (RandomActivation): The scheduler for activating agents.
         agents_moved (int): The number of agents that moved in the current step.
         num_agents (int): The total number of agents in the model.
@@ -217,16 +217,16 @@ class PolarizationModel(Model):
         graph (nx.Graph): The social network graph of the agents.
         datacollector (DataCollector): The data collector for recording model and agent data.
     """
-    def __init__(self, width=20, density=0.8, network_m=2, fermi_alpha=5, fermi_beta=3, connection_influence=0.8,
-                 target_connections=5, opinion_threshold=0.2, happiness_threshold=0.8):
+    def __init__(self, width=20, density=0.8, network_m=2, fermi_alpha=5, fermi_b=3, social_factor=0.8,
+                 connections_per_step=5, opinion_max_diff=0.2, happiness_threshold=0.8):
         self.width = width
         self.density = density
         self.network_m = network_m
         self.fermi_alpha = fermi_alpha
-        self.fermi_beta = fermi_beta
-        self.connection_influence = connection_influence
-        self.target_connections = target_connections
-        self.opinion_threshold = opinion_threshold
+        self.fermi_b = fermi_b
+        self.social_factor = social_factor
+        self.connections_per_step  = connections_per_step
+        self.opinion_max_diff  = opinion_max_diff
         # self.happiness_threshold = happiness_threshold
 
         self.schedule = RandomActivation(self)
@@ -352,7 +352,7 @@ class PolarizationModel(Model):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    model = PolarizationModel(density=0.9, fermi_alpha=4, fermi_beta=1, width=15, opinion_threshold=0.5,
+    model = PolarizationModel(density=0.9, fermi_alpha=4, fermi_b=1, width=15, opinion_max_diff=0.5,
                               happiness_threshold=0.2)
     stepcount = 50
 

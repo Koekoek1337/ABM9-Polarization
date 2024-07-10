@@ -16,7 +16,7 @@ problem = {
 }
 #set up data, loading from all csv files
 DATA_DIR = "./data/sobol/"
-datafiles = [dir for dir in os.listdir(DATA_DIR) if dir.startswith("combined_results")]
+datafiles = [dir for dir in os.listdir(DATA_DIR) if dir.startswith("combined_results2")]
 
 dataframes = []
 for dir in datafiles:
@@ -27,7 +27,7 @@ sobol_df = sobol_df.drop(columns=["Unnamed: 0"])
 
 
 # Creating a sortable column so the dataframe is ordered
-sobol_df['indexing'] = sobol_df[['fermi_alpha', 'fermi_beta', 'connection_influence', 'opinion_threshold', 'happiness_threshold']].sum(axis=1)
+sobol_df['indexing'] = sobol_df[['fermi_alpha', 'fermi_b', 'social_factor', 'opinion_max_diff', 'happiness_threshold']].sum(axis=1)
 sobol_id_describe = sobol_df.groupby(by=["indexing"]).describe()
 sobol_df = sobol_df.sort_values("indexing")
 
