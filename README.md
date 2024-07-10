@@ -44,9 +44,8 @@ This command launches a browser-based visualization showing a spatial grid of ag
     - `experiment_run.py`: Functions for plotting experiment data.
     - `experiments.py`: Manages experiment execution and result generation.
   - **sensitivityanalysis/**:
-    - `batch_run.py`: Conducts Sobol Sensitivity Analysis using BatchRunnerMP.
+    - `batch_run.py`: Conducts Sobol Sensitivity Analysis using FixedBatchRunner.
     - `ofatsa.ipynb`: Jupyter notebook for OFAT Sensitivity Analysis.
-    - `sobol-datacollector.py`: Initial script for Sobol analysis, now replaced.
     - `sobol_plot.py`: Plots results from Sobol Sensitivity Analysis.
   - **mesa_fix/**:
     - `batchrunner.py`: Modified Mesa batchrunner to support multiprocessing.
